@@ -2,15 +2,12 @@
 
 - Scrum Master
   - Grayson
-
 - Front-End
   - Michal 
-  -
-
+  - (null)
 - Backend
-  -
-  -
-  
--Full Stack
+  - (null)
+  - (null)
+- Full Stack
   - Grayson
-  -
+  - (null)
