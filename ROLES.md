@@ -4,7 +4,7 @@
   - Grayson
 - Frontend
   - Michal 
-  - (null)
+  - Alicia
 - Backend
   - (null)
   - (null)
