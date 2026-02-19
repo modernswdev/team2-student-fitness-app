@@ -1,4 +1,4 @@
-# team2-tempname
+# team2-Student Fitness App
 Team 2's Project Repository
 
 ## Team Members
