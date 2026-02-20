@@ -34,12 +34,6 @@ Languages: Python, HTML/CSS, SQL
 Frameworks: React (front-end), Django (back-end)
 Databases: MySQL
 
-**Problem Statement**  
-Lorem ipsum dolor sit amet
-
-**Solution Statement**  
-Lorem ipsum dolor sit amet
-
 **Key Features** (-Grayson)
 
 1. Tells you the hours of your local gym  
@@ -50,8 +44,10 @@ Lorem ipsum dolor sit amet
 
 **Users**
 
-1. User type  
-2. User type
+1. Administrator: full control of the system, including managing system setting 
+2. Registered User: access to their own user settings and full access to application features
+3. Guest User: limited access to application features and limited user settings
 
 **Communication**  
-Lorem ipsum dolor sit amet
+
+Daily communication will be maintained through Discord instant-messaging. Weekly meetings will be held on Tuesdays to update each team member's sprint progress. Bi-weekly stand-up meetings will be held in class on Mondays and Wednesdays for reporting to the client.
