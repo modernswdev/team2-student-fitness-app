@@ -1,10 +1,10 @@
 # team2-Student Fitness App
 Team 2's Project Repository
 
-#Problem Statement (-Jonathan)
+# Problem Statement (-Jonathan)
 Everybody has issues fitting working out into their lives. As a student, it becomes an almost impossible task in more ways than one. There are issues such as scheduling and a lack of experience.
 
-#Solution Statement (-Alicia)
+# Solution Statement (-Alicia)
 With student fitness, it will provide a data driven platform that will help handle students time management whilst also helping those who might feel intimidated with the gym. By syncing tutorial videos on different workouts / understanding the machine. This will give the student an idea what workout plan they want and provide the amount of time each work will take to fit in their schedule. But beyond tracking your physical fitness, our app will also provide the mental health tools, to provide the students with a holistic view of well-being (examples might include journaling mood tracking, and guides).
 
 
