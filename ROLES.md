@@ -6,8 +6,8 @@
   - Michal 
   - Alicia
 - Backend
-  - (null)
-  - (null)
+  - Lin
+  - Jonathan
 - Full Stack
   - Grayson
-  - (null)
+  - Hannah
