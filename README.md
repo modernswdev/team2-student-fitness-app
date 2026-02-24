@@ -37,9 +37,9 @@ We believe that a stronger body and a healthier mind are the ultimate academic a
     * <https://github.com/hannku>
 
 ## Tech Stack
-Languages: Python, HTML/CSS, SQL
-Frameworks: React (front-end), Django (back-end)
-Databases: MySQL
+Languages: Kotlin, Java
+Frameworks: Android (native mobile app)
+Databases: Firebase/SQLite
 
 **Key Features** (-Grayson)
 
