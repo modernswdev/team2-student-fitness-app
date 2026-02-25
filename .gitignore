@@ -74,3 +74,5 @@ lint/tmp/
 !gradle-wrapper.jar
 !gradle/wrapper/
 !gradle/libs.versions.toml
+.idea/deploymentTargetSelector.xml
+.idea/deviceManager.xml
