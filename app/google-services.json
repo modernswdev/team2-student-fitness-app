@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "723098580619",
+    "project_id": "student-fitness-app",
+    "storage_bucket": "student-fitness-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:723098580619:android:b2566e28cb62237e97468e",
+        "android_client_info": {
+          "package_name": "com.team2.studentfitness"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNe4x-rGSDKfWLGELFw9dLw5t4no-3YMU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
