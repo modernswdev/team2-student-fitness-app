@@ -1,0 +1,26 @@
+ID,Name,Minutes,Focus,Type,Difficulty,Split
+W001,Push Strength,50,Chest/Shoulders/Triceps,Strength,Intermediate,Push
+W002,Pull Strength,50,Back/Biceps,Strength,Intermediate,Pull
+W003,Leg Strength,60,Lower Body,Strength,Intermediate,Legs
+W004,Upper Beginner,35,Upper Body,Strength,Beginner,Upper
+W005,Lower Beginner,40,Lower Body,Strength,Beginner,Lower
+W006,Full Body Hypertrophy,55,Full Body,Strength,Intermediate,Full
+W007,Core Focus,25,Core,Strength,Beginner,Core
+W008,HIIT 30,30,Full Body,Cardio,Intermediate,HIIT
+W009,Athlete Conditioning,45,Athletic,Cardio,Advanced,Athletic
+W010,Glute Builder,50,Glutes,Strength,Intermediate,Lower
+W011,Chest Specialization,45,Chest,Strength,Intermediate,Body Part
+W012,Back Thickness,50,Back,Strength,Intermediate,Body Part
+W013,Shoulder Builder,40,Shoulders,Strength,Intermediate,Body Part
+W014,Arm Pump,40,Arms,Strength,Beginner,Body Part
+W015,Power Day,60,Explosive,Strength,Advanced,Power
+W016,Cardio Endurance,45,Cardio,Cardio,Beginner,Cardio
+W017,Bodyweight Only,35,Full Body,Strength,Beginner,Full
+W018,Machine Circuit,45,Full Body,Strength,Beginner,Full
+W019,Posterior Chain,50,Hamstrings/Glutes,Strength,Intermediate,Lower
+W020,Athletic Speed,40,Speed/Agility,Cardio,Advanced,Athletic
+W021,Upper Strength Advanced,60,Upper,Strength,Advanced,Upper
+W022,Lower Strength Advanced,65,Lower,Strength,Advanced,Lower
+W023,Fat Burn Circuit,30,Full Body,Cardio,Beginner,HIIT
+W024,Mobility & Recovery,30,Mobility,Recovery,Beginner,Recovery
+W025,Core & Conditioning,35,Core,Mixed,Intermediate,Core
