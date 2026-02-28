@@ -1,0 +1,128 @@
+:root {
+    --bg-color: #078c8c; /* Neon Teal */
+    --card-bg: #f7eeee;
+    --accent-color: #f2a444; /* Neon Orange */  
+    --text-main: #ffffff;
+    --text-dim: #070707;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
+}
+
+.hero-section {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.hero-section h1 {
+    font-size: 3rem;
+    font-style: italic;
+    font-weight: bold;
+    letter-spacing: -1px;
+    color: var(--accent-color);
+}
+
+.input-group {
+    margin-bottom: 1.5rem;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    background: var(--card-bg);
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--accent-color);
+    color: black;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+.divider {
+    text-align: center;
+    margin: 1.5rem 0;
+    border-bottom: 1px solid #333;
+    line-height: 0.1em;
+}
+
+.divider span {
+    background: var(--bg-color);
+    padding: 0 10px;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+}
+
+.btn-social {
+    width: 100%;
+    padding: 12px;
+    background: white;
+    color: #333;
+    border-radius: 8px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-social img { width: 18px; }
+
+.footer-text {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+}
+
+.footer-text a {
+    color: var(--accent-color);
+    text-decoration: none;
+}
