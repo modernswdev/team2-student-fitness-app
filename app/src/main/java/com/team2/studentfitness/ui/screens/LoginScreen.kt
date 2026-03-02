@@ -1,4 +1,4 @@
-package com.example.scholarstrong 
+package com.team2.studentfitness.ui.screens
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -9,7 +9,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -20,20 +19,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-// CSS Colors
-val NeonTeal = Color(0xFF078C8C)
-val NeonOrange = Color(0xFFF2A444)
-val CardBg = Color(0xFFF7EEEE)
-val TextDim = Color(0xFF070707)
+import com.team2.studentfitness.ui.theme.NeonTeal
+import com.team2.studentfitness.ui.theme.NeonOrange
+import com.team2.studentfitness.ui.theme.CardBg
+import com.team2.studentfitness.ui.theme.TextDim
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(modifier: Modifier = Modifier) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(NeonTeal) // body { background-color }
     ) {
