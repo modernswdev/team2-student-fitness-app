@@ -20,28 +20,22 @@ class MainActivity : ComponentActivity() {
         setContent {
             StudentFitnessTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                   // Pass the innerPadding to your LoginScreen so it respects the edge-to-edge layout
+                    LoginScreen(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
     }
 }
-
+// Updated to accept a 'modifier' to handle the Scaffold padding correctly
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+fun LoginScreen(modifier: Modifier = Modifier) {
 }
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun LoginPreview() {
     StudentFitnessTheme {
-        Greeting("Android")
+        LoginScreen()
     }
 }
