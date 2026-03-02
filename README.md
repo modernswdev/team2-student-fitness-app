@@ -1,14 +1,14 @@
 # team2-Student Fitness App
 Team 2's Project Repository
 
-# Problem Statement (-Jonathan)
+# Problem Statement 
 Everybody has issues fitting working out into their lives. As a student, it becomes an almost impossible task in more ways than one. There are issues such as scheduling and a lack of experience.
 
-# Solution Statement (-Alicia)
+# Solution Statement 
 With student fitness, it will provide a data driven platform that will help handle students time management whilst also helping those who might feel intimidated with the gym. By syncing tutorial videos on different workouts / understanding the machine. This will give the student an idea what workout plan they want and provide the amount of time each work will take to fit in their schedule. But beyond tracking your physical fitness, our app will also provide the mental health tools, to provide the students with a holistic view of well-being (examples might include journaling mood tracking, and guides).
 
 
-# Mission Statement (-Alicia)
+# Mission Statement 
 Our app, Student Fitness (pending name), our mission is to redefine the college fitness experience by bridging the gap between physical exertion and mental resilience. 
 We believe that a student’s well-being isn't just measured by the weights they lift, but by the clarity and balance they maintain throughout their academic journey. 
 By providing a dual-purpose platform, we empower students to cultivate a sustainable lifestyle where body and mind are trained in tandem.
@@ -33,15 +33,14 @@ We believe that a stronger body and a healthier mind are the ultimate academic a
     * <https://github.com/michalgriff>
 * Alicia Johansen
     * <https://github.com/AJohansen-code>
-* Khangai Altangerel
-    * <https://github.com/hannku>
+
 
 ## Tech Stack
 Languages: Kotlin, Java
 Frameworks: Android (native mobile app)
 Databases: Firebase/SQLite
 
-**Key Features** (-Grayson)
+**Key Features** 
 
 1. Tells you the hours of your local gym  
 2. Gives you workouts based on their length in order to properly time them out to fitting your schedule  
