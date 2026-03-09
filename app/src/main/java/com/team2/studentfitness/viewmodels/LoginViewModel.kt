@@ -1,5 +1,8 @@
 package com.team2.studentfitness.viewmodels
 
+import com.team2.studentfitness.database.UserDatabase
+
+
 class LoginViewModel(private val pinManager: SecurePinManager){
     //This is currently unused until we implement accounts, if we do so.
     fun login(username: String, password: String): Boolean {
