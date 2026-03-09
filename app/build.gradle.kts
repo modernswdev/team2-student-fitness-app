@@ -47,6 +47,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.security.crypto)
     implementation(libs.core.ktx)
+    implementation(libs.androidx.navigation.compose)
     
     // Room
     implementation(libs.androidx.room.runtime)

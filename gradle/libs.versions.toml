@@ -13,6 +13,7 @@ securityCrypto = "1.1.0"
 coreKtxVersion = "1.7.0"
 room = "2.8.4"
 ksp = "2.1.0-1.0.29"
+navigationCompose = "2.8.5"
 
 [libraries]
 androidx-core = { module = "androidx.test:core", version.ref = "core" }
@@ -35,6 +36,7 @@ androidx-room-runtime = { group = "androidx.room", name = "room-runtime", versio
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "coreKtxVersion" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

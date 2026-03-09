@@ -10,8 +10,15 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
-// App-specific colors
-val NeonTeal = Color(0xFF078C8C)
-val NeonOrange = Color(0xFFF2A444)
-val CardBg = Color(0xFFF7EEEE)
-val TextDim = Color(0xFF070707)
+val Teal = Color(0xFF018C8C)
+val LightTeal = Color(0xFF01A9A9)
+val Mint = Color(0xFF5CBFA9)
+val LightGreen = Color(0xFFBFE6A3)
+val Orange = Color(0xFFF2A964)
+val Cream = Color(0xFFFFF7E8)
+
+// Neon Theme for Login
+val NeonTeal = Color(0xFF00E5FF)
+val NeonOrange = Color(0xFFFF6D00)
+val CardBg = Color(0xFFFFFFFF)
+val TextDim = Color(0xFFB0BEC5)
