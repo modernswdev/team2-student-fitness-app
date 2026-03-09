@@ -26,7 +26,7 @@ import com.team2.studentfitness.ui.theme.TextDim
 import com.team2.studentfitness.database.UserDao
 
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier) {
+fun LoginScreen(modifier: Modifier = Modifier, onBypassLogin: () -> Unit = {}) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -118,6 +118,14 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text("Sign In", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                }
+
+                // Bypass Button (Dev Only)
+                TextButton(
+                    onClick = onBypassLogin,
+                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp)
+                ) {
+                    Text("Bypass Login (Dev Mode)", color = NeonOrange.copy(alpha = 0.8f), fontSize = 12.sp)
                 }
             }
 

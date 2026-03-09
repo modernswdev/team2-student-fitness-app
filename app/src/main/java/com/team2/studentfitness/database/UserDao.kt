@@ -31,11 +31,7 @@ interface UserDao {
 
     //Add new user
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertUser(name: String, password: String, loginCount: Int)
-
-    //Add new user (ignore if already exists)
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertUserDupe(name: String, password: String, loginCount: Int)
+    fun insert(user: User)
 
     //Delete user
     @Delete
