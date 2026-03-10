@@ -19,11 +19,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.team2.studentfitness.ui.theme.NeonTeal
-import com.team2.studentfitness.ui.theme.NeonOrange
-import com.team2.studentfitness.ui.theme.CardBg
-import com.team2.studentfitness.ui.theme.TextDim
-import com.team2.studentfitness.database.UserDao
+import com.team2.studentfitness.ui.theme.LoginBackground
+import com.team2.studentfitness.ui.theme.LoginOrange
+import com.team2.studentfitness.ui.theme.LoginInputBg
 
 @Composable
 fun LoginScreen(modifier: Modifier = Modifier, onBypassLogin: () -> Unit = {}) {
@@ -33,7 +31,7 @@ fun LoginScreen(modifier: Modifier = Modifier, onBypassLogin: () -> Unit = {}) {
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(NeonTeal) // body { background-color }
+            .background(LoginBackground)
     ) {
         Column(
             modifier = Modifier
@@ -49,7 +47,7 @@ fun LoginScreen(modifier: Modifier = Modifier, onBypassLogin: () -> Unit = {}) {
                 fontSize = 42.sp,
                 fontWeight = FontWeight.Bold,
                 fontStyle = FontStyle.Italic,
-                color = NeonOrange,
+                color = LoginOrange,
                 letterSpacing = (-1).sp
             )
             Text(
@@ -65,7 +63,7 @@ fun LoginScreen(modifier: Modifier = Modifier, onBypassLogin: () -> Unit = {}) {
             // FORM SECTION
             Column(modifier = Modifier.fillMaxWidth(0.9f)) {
                 // Email Input
-                Text("Email Address", color = TextDim, fontSize = 14.sp)
+                Text("Email Address", color = Color.Black, fontSize = 14.sp)
                 Spacer(modifier = Modifier.height(8.dp))
                 TextField(
                     value = email,
@@ -73,9 +71,9 @@ fun LoginScreen(modifier: Modifier = Modifier, onBypassLogin: () -> Unit = {}) {
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = { Text("name@example.com", color = Color.Gray) },
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = CardBg,
-                        unfocusedContainerColor = CardBg,
-                        focusedIndicatorColor = NeonOrange,
+                        focusedContainerColor = LoginInputBg,
+                        unfocusedContainerColor = LoginInputBg,
+                        focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         focusedTextColor = Color.Black,
                         unfocusedTextColor = Color.Black
@@ -87,7 +85,7 @@ fun LoginScreen(modifier: Modifier = Modifier, onBypassLogin: () -> Unit = {}) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Password Input
-                Text("Password", color = TextDim, fontSize = 14.sp)
+                Text("Password", color = Color.Black, fontSize = 14.sp)
                 Spacer(modifier = Modifier.height(8.dp))
                 TextField(
                     value = password,
@@ -97,9 +95,9 @@ fun LoginScreen(modifier: Modifier = Modifier, onBypassLogin: () -> Unit = {}) {
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = CardBg,
-                        unfocusedContainerColor = CardBg,
-                        focusedIndicatorColor = NeonOrange,
+                        focusedContainerColor = LoginInputBg,
+                        unfocusedContainerColor = LoginInputBg,
+                        focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         focusedTextColor = Color.Black,
                         unfocusedTextColor = Color.Black
@@ -114,7 +112,7 @@ fun LoginScreen(modifier: Modifier = Modifier, onBypassLogin: () -> Unit = {}) {
                 Button(
                     onClick = { /* Handle Login */ },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = NeonOrange),
+                    colors = ButtonDefaults.buttonColors(containerColor = LoginOrange),
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text("Sign In", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 16.sp)
@@ -125,7 +123,7 @@ fun LoginScreen(modifier: Modifier = Modifier, onBypassLogin: () -> Unit = {}) {
                     onClick = onBypassLogin,
                     modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp)
                 ) {
-                    Text("Bypass Login (Dev Mode)", color = NeonOrange.copy(alpha = 0.8f), fontSize = 12.sp)
+                    Text("Bypass Login (Dev Mode)", color = LoginOrange.copy(alpha = 0.8f), fontSize = 12.sp)
                 }
             }
 
@@ -135,7 +133,7 @@ fun LoginScreen(modifier: Modifier = Modifier, onBypassLogin: () -> Unit = {}) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Divider(modifier = Modifier.weight(1f), color = Color.DarkGray.copy(alpha = 0.5f))
-                Text(" OR ", modifier = Modifier.padding(horizontal = 10.dp), color = TextDim, fontSize = 12.sp)
+                Text(" OR ", modifier = Modifier.padding(horizontal = 10.dp), color = Color.Black, fontSize = 12.sp)
                 Divider(modifier = Modifier.weight(1f), color = Color.DarkGray.copy(alpha = 0.5f))
             }
 
@@ -156,11 +154,11 @@ fun LoginScreen(modifier: Modifier = Modifier, onBypassLogin: () -> Unit = {}) {
             Text(
                 text = buildAnnotatedString {
                     append("New here? ")
-                    withStyle(style = SpanStyle(color = NeonOrange, fontWeight = FontWeight.Bold)) {
+                    withStyle(style = SpanStyle(color = LoginOrange, fontWeight = FontWeight.Bold)) {
                         append("Create an account")
                     }
                 },
-                color = TextDim,
+                color = Color.Black,
                 fontSize = 14.sp
             )
         }
