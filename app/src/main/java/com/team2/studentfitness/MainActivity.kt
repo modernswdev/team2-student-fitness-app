@@ -7,8 +7,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.team2.studentfitness.ui.screens.LoginScreen
+import com.team2.studentfitness.ui.theme.Dashboard
+import com.team2.studentfitness.ui.theme.DetailScreen
 import com.team2.studentfitness.ui.theme.StudentFitnessTheme
 
 class MainActivity : ComponentActivity() {
@@ -17,9 +25,30 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             StudentFitnessTheme {
+                val navController = rememberNavController()
+
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                   // Pass the innerPadding to your LoginScreen so it respects the edge-to-edge layout
-                    LoginScreen(modifier = Modifier.padding(innerPadding))
+                    NavHost(
+                        navController = navController,
+                        startDestination = "login",
+                        modifier = Modifier.padding(innerPadding)
+                    ) {
+                        composable("login") {
+                            LoginScreen(
+                                onBypassLogin = { navController.navigate("dashboard") }
+                            )
+                        }
+                        composable("dashboard") {
+                            Dashboard(navController = navController)
+                        }
+                        composable(
+                            route = "detail/{feature}",
+                            arguments = listOf(navArgument("feature") { type = NavType.StringType })
+                        ) { backStackEntry ->
+                            val feature = backStackEntry.arguments?.getString("feature")
+                            DetailScreen(navController = navController, feature = feature)
+                        }
+                    }
                 }
             }
         }
