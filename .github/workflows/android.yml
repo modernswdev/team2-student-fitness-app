@@ -54,20 +54,17 @@ jobs:
       - name: Make Gradle executable
         run: chmod +x gradlew
 
-      - name: Run Android emulator tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 30
-          target: google_apis
-          arch: x86_64
-          profile: Nexus 6
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
-          disable-animations: true
-          emulator-boot-timeout: 900
-          script: |
-            adb wait-for-device
-            adb shell input keyevent 82
-            ./gradlew connectedDebugAndroidTest
+      - name: Accept SDK licenses
+        run: yes | sdkmanager --licenses > /dev/null
+
+      - name: Install Android SDK components
+        run: |
+          sdkmanager --install "platforms;android-30" "platform-tools" "build-tools;35.0.0" "emulator" "system-images;android-30;google_apis;x86_64"
+
+      - name: Run instrumentation tests on Gradle Managed Device
+        run: ./gradlew \
+          connectedDebugAndroidTest \
+          -Pandroid.testInstrumentationRunnerArguments.clearPackageData=true
 
       - name: Upload instrumentation test report
         if: always()
