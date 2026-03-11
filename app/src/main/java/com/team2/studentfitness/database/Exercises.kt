@@ -10,6 +10,12 @@ data class Exercises (
     @PrimaryKey(autoGenerate = true)
     val uid: Int,
     @ColumnInfo(name = "name")
-    val workoutName: String
+    val workoutName: String,
+    @ColumnInfo(name = "muscleGroup")
+    val muscleGroup: String,
+    @ColumnInfo(name = "difficulty")
+    val difficulty: Int,   //0 = beginner, 1 = intermediate, 2 = advanced
+    @ColumnInfo(name = "description")
+    val description: String
 )
 
