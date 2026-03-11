@@ -23,7 +23,6 @@ import com.team2.studentfitness.ui.theme.NeonTeal
 import com.team2.studentfitness.ui.theme.NeonOrange
 import com.team2.studentfitness.ui.theme.CardBg
 import com.team2.studentfitness.ui.theme.TextDim
-import com.team2.studentfitness.database.UserDao
 
 @Composable
 fun LoginScreen(modifier: Modifier = Modifier, onBypassLogin: () -> Unit = {}) {

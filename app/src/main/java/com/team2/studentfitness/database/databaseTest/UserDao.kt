@@ -1,12 +1,12 @@
-package com.team2.studentfitness.database
+package com.team2.studentfitness.database.databaseTest
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Update
 import androidx.room.OnConflictStrategy
 
+//This dao is for testing purposes only
 @Dao
 interface UserDao {
     //Select all users
