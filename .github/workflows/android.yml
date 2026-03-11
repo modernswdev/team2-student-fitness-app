@@ -26,7 +26,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Accept SDK licenses
+      - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses
 
       - name: Install Android SDK components
@@ -38,8 +38,6 @@ jobs:
 
       - name: Make gradlew executable
         run: chmod +x gradlew
-      - name: Gradle build
-        run: ./gradlew build --no-daemon
 
       # ----------------------------
       # Run JVM unit tests
@@ -49,7 +47,14 @@ jobs:
         run: ./gradlew testDebugUnitTest
 
       # ----------------------------
-      # Run Android emulator tests
+      # Build app and test APKs
+      # ----------------------------
+
+      - name: Build Debug APK and Test APK
+        run: ./gradlew assembleDebug assembleDebugAndroidTest
+
+      # ----------------------------
+      # Run Android instrumentation tests
       # ----------------------------
 
       - name: Run instrumentation tests
@@ -59,20 +64,18 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: Nexus 6
-          script: ./gradlew connectedDebugAndroidTest
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            adb wait-for-device
+            adb shell input keyevent 82
+            ./gradlew connectedDebugAndroidTest
 
       # ----------------------------
-      # Build APK
+      # Upload APK artifact
       # ----------------------------
 
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug
-
-      # ----------------------------
-      # Upload build artifacts
-      # ----------------------------
-
-      - name: Upload APK
+      - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk
