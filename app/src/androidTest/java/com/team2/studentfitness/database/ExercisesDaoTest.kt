@@ -36,17 +36,20 @@ class ExercisesDaoTest {
     @Test
     @Throws(Exception::class)
     fun insertAndGetAllExercises() {
-        val exercise = Exercises(uid = 1, workoutName = "Pushups")
+        val exercise = Exercises(uid = 1, workoutName = "Pushups", muscleGroup = "Chest", difficulty = 1, description = "Description")
         exercisesDao.insert(exercise)
         val allExercises = exercisesDao.getAll()
         assertEquals(1, allExercises.size)
         assertEquals("Pushups", allExercises[0].workoutName)
+        assertEquals("Chest", allExercises[0].muscleGroup)
+        assertEquals(1, allExercises[0].difficulty)
+        assertEquals("Description", allExercises[0].description)
     }
 
     @Test
     @Throws(Exception::class)
     fun getByIdAndName() {
-        val exercise = Exercises(uid = 1, workoutName = "Squats")
+        val exercise = Exercises(uid = 1, workoutName = "Squats", muscleGroup = "Legs", difficulty = 1, description = "Description")
         exercisesDao.insert(exercise)
 
         val byId = exercisesDao.getById(1)
@@ -61,8 +64,8 @@ class ExercisesDaoTest {
     @Test
     @Throws(Exception::class)
     fun deleteExercises() {
-        val e1 = Exercises(uid = 1, workoutName = "Plank")
-        val e2 = Exercises(uid = 2, workoutName = "Lunge")
+        val e1 = Exercises(uid = 1, workoutName = "Plank", muscleGroup = "Body", difficulty = 1, description = "Description")
+        val e2 = Exercises(uid = 2, workoutName = "Lunge", muscleGroup = "Legs", difficulty = 1, description = "Description")
         exercisesDao.insert(e1)
         exercisesDao.insert(e2)
 
