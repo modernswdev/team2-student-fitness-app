@@ -1,4 +1,4 @@
-package com.team2.studentfitness.ui.theme
+package com.team2.studentfitness.ui.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,10 +32,10 @@ fun DetailScreen(navController: NavController, feature: String?) {
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Cream)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = _root_ide_package_.com.team2.studentfitness.ui.theme.Cream)
             )
         },
-        containerColor = Cream
+        containerColor = _root_ide_package_.com.team2.studentfitness.ui.theme.Cream
     ) { paddingValues ->
         Box(
             modifier = Modifier

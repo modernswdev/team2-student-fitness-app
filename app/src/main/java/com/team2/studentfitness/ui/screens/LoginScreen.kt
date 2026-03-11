@@ -24,7 +24,7 @@ import com.team2.studentfitness.ui.theme.LoginOrange
 import com.team2.studentfitness.ui.theme.LoginInputBg
 
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier, onBypassLogin: () -> Unit = {}) {
+fun LoginScreen(modifier: Modifier = Modifier, onOpenDevMenu: () -> Unit = {}) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -120,10 +120,10 @@ fun LoginScreen(modifier: Modifier = Modifier, onBypassLogin: () -> Unit = {}) {
 
                 // Bypass Button (Dev Only)
                 TextButton(
-                    onClick = onBypassLogin,
+                    onClick = onOpenDevMenu,
                     modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp)
                 ) {
-                    Text("Bypass Login (Dev Mode)", color = LoginOrange.copy(alpha = 0.8f), fontSize = 12.sp)
+                    Text("Open Dev Menu", color = LoginOrange.copy(alpha = 0.8f), fontSize = 12.sp)
                 }
             }
 
