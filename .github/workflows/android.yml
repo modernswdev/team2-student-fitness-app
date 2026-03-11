@@ -1,71 +1,76 @@
-name: Android CI
+name: Android Emulator CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+
+env:
+  ANDROID_EMULATOR_NAME: test
+  ANDROID_API_LEVEL: 30
+  ANDROID_BUILD_TOOLS: 30.0.3
+  ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
+  JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/11.0.30-7/x64
 
 jobs:
-  build:
+  android:
     runs-on: ubuntu-latest
-
-    env:
-      ANDROID_EMULATOR_NAME: test
-      ANDROID_API_LEVEL: 30
-      ANDROID_BUILD_TOOLS: 30.0.3
-
     steps:
-    # 1. Checkout the repository
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      # 1. Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    # 2. Set up Java (required for sdkmanager & Gradle)
-    - name: Set up Java
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: '11'
+      # 2. Set up Java
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 11
 
-    # 3. Install required dependencies for emulator & sdkmanager
-    - name: Install Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y wget unzip curl lib32stdc++6 lib32z1 qemu-kvm
+      # 3. Download and install Android SDK
+      - name: Install Android SDK
+        run: |
+          mkdir -p $ANDROID_SDK_ROOT
+          curl -sSL https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -o cmdline-tools.zip
+          unzip -q cmdline-tools.zip -d $ANDROID_SDK_ROOT
+          mkdir -p $ANDROID_SDK_ROOT/cmdline-tools/latest
+          mv $ANDROID_SDK_ROOT/cmdline-tools/* $ANDROID_SDK_ROOT/cmdline-tools/latest/
 
-    # 4. Install Android SDK command-line tools
-    - name: Set up Android SDK
-      run: |
-        ANDROID_SDK_ROOT="${RUNNER_TEMP}/android-sdk"
-        mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
-        curl -o sdk-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-        unzip sdk-tools.zip -d $ANDROID_SDK_ROOT/cmdline-tools
-        mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest
-        rm sdk-tools.zip
-        echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
-        echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          # Add tools to PATH
+          echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$ANDROID_SDK_ROOT/platform-tools" >> $GITHUB_PATH
 
-    # 5. Accept all Android SDK licenses
-    - name: Accept SDK licenses
-      run: yes | sdkmanager --licenses
+      # 4. Accept licenses
+      - name: Accept SDK licenses
+        run: yes | sdkmanager --licenses
 
-    # 6. Install required SDK packages
-    - name: Install SDK packages
-      run: |
-        sdkmanager "platform-tools" "platforms;android-${{ env.ANDROID_API_LEVEL }}" "system-images;android-${{ env.ANDROID_API_LEVEL }};google_apis;x86_64"
+      # 5. Install platform, build tools, and system image
+      - name: Install SDK packages
+        run: |
+          sdkmanager "platform-tools" \
+                     "platforms;android-${{ env.ANDROID_API_LEVEL }}" \
+                     "system-images;android-${{ env.ANDROID_API_LEVEL }};google_apis;x86_64"
 
-    # 7. Create and start the Android emulator
-    - name: Create AVD
-      run: |
-        echo no | avdmanager create avd -n $ANDROID_EMULATOR_NAME -k "system-images;android-${{ env.ANDROID_API_LEVEL }};google_apis;x86_64" --force
-        $ANDROID_SDK_ROOT/emulator/emulator -avd $ANDROID_EMULATOR_NAME -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -accel off &
-        adb wait-for-device
-        adb shell input keyevent 82  # unlock screen
+      # 6. Create AVD
+      - name: Create AVD
+        run: |
+          echo no | avdmanager create avd \
+            -n $ANDROID_EMULATOR_NAME \
+            -k "system-images;android-${{ env.ANDROID_API_LEVEL }};google_apis;x86_64" \
+            --force
 
-    # 8. Build project with Gradle
-    - name: Build with Gradle
-      run: ./gradlew build
+      # 7. Launch emulator
+      - name: Launch emulator
+        run: |
+          $ANDROID_SDK_ROOT/emulator/emulator \
+            -avd $ANDROID_EMULATOR_NAME \
+            -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -accel off &
 
-    # 9. Run instrumentation tests on emulator
-    - name: Run Android Tests
-      run: ./gradlew connectedAndroidTest
+          echo "Waiting for emulator to boot..."
+          adb wait-for-device
+          adb shell input keyevent 82  # unlock screen
+
+      # 8. Run your Android tests
+      - name: Run instrumentation tests
+        run: |
+          ./gradlew connectedAndroidTest
