@@ -1,67 +1,59 @@
-name: Android Emulator CI
+name: Android CI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
 
 jobs:
-  android-emulator:
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-
+  build-and-test:
+    runs-on: ubuntu-latest  # GitHub-hosted runner
     env:
-      ANDROID_SDK_ROOT: $RUNNER_TEMP/android-sdk
-      ANDROID_HOME: $RUNNER_TEMP/android-sdk
-      PATH: $RUNNER_TEMP/android-sdk/cmdline-tools/latest/bin:$RUNNER_TEMP/android-sdk/emulator:$RUNNER_TEMP/android-sdk/platform-tools:$PATH
+      ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
 
     steps:
-      - name: Install core Linux tools
-        run: sudo apt-get update && sudo apt-get install -y tar unzip curl
-
-      - name: Checkout repository
+      # Checkout your repo
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Download Android Command Line Tools
+      # Install required packages
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip curl lib32stdc++6 lib32z1 qemu-kvm
+
+      # Install Android SDK command line tools
+      - name: Download Android SDK
         run: |
           mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
-          cd $ANDROID_SDK_ROOT/cmdline-tools
-          curl -o commandlinetools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-          unzip commandlinetools.zip
-          mv cmdline-tools latest
+          curl -o sdk-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+          unzip sdk-tools.zip -d $ANDROID_SDK_ROOT/cmdline-tools
+          mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest
+          rm sdk-tools.zip
 
-      - name: Accept SDK licenses
-        run: yes | sdkmanager --licenses
+      # Accept licenses
+      - name: Accept Android Licenses
+        run: yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
 
-      - name: Install SDK packages
+      # Install platform tools & emulator
+      - name: Install Platform & Emulator
         run: |
-          sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" "system-images;android-30;google_apis;x86_64" "emulator"
+          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-30" "emulator" "system-images;android-30;google_apis;x86_64"
 
-      - name: Create Android Virtual Device (AVD)
+      # Create AVD
+      - name: Create AVD
         run: |
-          echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" -f
+          echo "no" | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
 
-      - name: Launch Emulator
+      # Start emulator
+      - name: Start Emulator
         run: |
-          nohup emulator -avd test -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -accel off &
-
-      - name: Wait for Emulator to boot
-        run: |
+          $ANDROID_SDK_ROOT/emulator/emulator -avd test -no-window -gpu swiftshader_indirect -no-audio -no-snapshot &
           adb wait-for-device
-          boot_completed=""
-          until [ "$boot_completed" = "1" ]; do
-            sleep 5
-            boot_completed=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
-            echo "Waiting for emulator to boot..."
-          done
-          adb devices
+          adb shell input keyevent 82  # unlock device
 
-      - name: Build APK
-        run: ./gradlew assembleDebug
-
-      - name: Run Unit Tests
-        run: ./gradlew testDebug
-
-      - name: Run Instrumentation Tests on Emulator
-        run: ./gradlew connectedDebugAndroidTest
+      # Run your tests
+      - name: Run Instrumentation Tests
+        run: |
+          ./gradlew connectedAndroidTest
