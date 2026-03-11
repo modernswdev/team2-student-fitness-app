@@ -54,24 +54,6 @@ jobs:
       - name: Make Gradle executable
         run: chmod +x gradlew
 
-      - name: Set Android SDK environment variables
-        run: |
-          echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=/usr/local/lib/android/sdk" >> $GITHUB_ENV
-          echo "PATH=$PATH:/usr/local/lib/android/sdk/cmdline-tools/latest/bin:/usr/local/lib/android/sdk/platform-tools" >> $GITHUB_ENV
-
-      - name: Accept SDK licenses
-        run: yes | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses
-
-      - name: Install Android SDK components
-        run: |
-          /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager \
-            "platforms;android-30" \
-            "platform-tools" \
-            "build-tools;35.0.0" \
-            "emulator" \
-            "system-images;android-30;google_apis;x86_64"
-
       - name: Run Android emulator tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -83,6 +65,7 @@ jobs:
           disable-animations: true
           emulator-boot-timeout: 900
           script: |
+            echo "Waiting for device to be ready..."
             adb wait-for-device
             adb shell input keyevent 82
             ./gradlew connectedDebugAndroidTest
