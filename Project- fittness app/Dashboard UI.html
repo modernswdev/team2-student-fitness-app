@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellness Dashboard</title>
+    <link rel="stylesheet" href="Dashboard Style.css">
+</head>
+<body>
+    <div class="phone-container">
+        <header>
+            <div>
+                <p>Good Morning,</p>
+                <h1>Student</h1>
+            </div>
+            <div class="profile-pic"></div>
+        </header>
+
+        <div class="tab-container">
+            <button class="tab-btn active" onclick="switchTab('workout')">Workout</button>
+            <button class="tab-btn" onclick="switchTab('mental')">Mental Health</button>
+        </div>
+
+        <div id="workout-section">
+            <section class="main-card">
+                <div class="progress-info">
+                    <h2>Daily Goal</h2>
+                    <p>80% Completed</p>
+                    <button class="start-btn">Resume</button>
+                </div>
+                <div class="progress-circle">
+                    <svg viewBox="0 0 36 36" class="circular-chart">
+                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="circle" stroke-dasharray="80, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                </div>
+            </section>
+
+            <h3>Video Tutorials</h3>
+            <div class="video-grid">
+                <div class="video-card">
+                    <div class="video-thumb">▶</div>
+                    <p>Squat Form</p>
+                </div>
+                <div class="video-card">
+                    <div class="video-thumb">▶</div>
+                    <p>HIIT Cardio</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="mental-section" style="display: none;">
+            <div class="mood-tracker">
+                <p>How are you feeling?</p>
+                <div class="emojis">
+                    <span>😔</span><span>😐</span><span>🙂</span><span>🤩</span>
+                </div>
+            </div>
+
+            <h3>Mindfulness & Stress</h3>
+            <div class="resource-list">
+                <a href="#" class="resource-item">
+                    <span class="icon">🧘</span>
+                    <div class="details">
+                        <strong>4-7-8 Breathing</strong>
+                        <span>Relieve anxiety now</span>
+                    </div>
+                </a>
+                <a href="https://www.mentalhealth.org.uk/" target="_blank" class="resource-item">
+                    <span class="icon">🔗</span>
+                    <div class="details">
+                        <strong>Stress Management</strong>
+                        <span>External Source</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            const workout = document.getElementById('workout-section');
+            const mental = document.getElementById('mental-section');
+            const buttons = document.querySelectorAll('.tab-btn');
+
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            if(tab === 'workout') {
+                workout.style.display = 'block';
+                mental.style.display = 'none';
+                buttons[0].classList.add('active');
+            } else {
+                workout.style.display = 'none';
+                mental.style.display = 'block';
+                buttons[1].classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
