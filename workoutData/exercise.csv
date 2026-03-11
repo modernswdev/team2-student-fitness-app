@@ -1,81 +1,81 @@
-ID,Name
-E001,Barbell Bench Press
-E002,Dumbbell Bench Press
-E003,Incline Dumbbell Press
-E004,Chest Fly (Dumbbell)
-E005,Push-Ups
-E006,Cable Chest Fly
-E007,Pull-Ups
-E008,Lat Pulldown
-E009,Barbell Row
-E010,Dumbbell Row
-E011,Seated Cable Row
-E012,Face Pull
-E013,T-Bar Row
-E014,Inverted Row
-E015,Overhead Barbell Press
-E016,Dumbbell Shoulder Press
-E017,Lateral Raises
-E018,Front Raises
-E019,Rear Delt Fly
-E020,Arnold Press
-E021,Barbell Curl
-E022,Dumbbell Curl
-E023,Hammer Curl
-E024,Preacher Curl
-E025,Tricep Dips
-E026,Skull Crushers
-E027,Cable Tricep Pushdown
-E028,Overhead Tricep Extension
-E029,Barbell Squat
-E030,Goblet Squat
-E031,Leg Press
-E032,Walking Lunges
-E033,Bulgarian Split Squat
-E034,Step-Ups
-E035,Jump Squats
-E036,Wall Sit
-E037,Romanian Deadlift
-E038,Conventional Deadlift
-E039,Hip Thrust
-E040,Hamstring Curl
-E041,Glute Bridge
-E042,Kettlebell Swing
-E043,Plank
-E044,Side Plank
-E045,Bicycle Crunch
-E046,Leg Raises
-E047,Russian Twist
-E048,Hanging Leg Raise
-E049,Ab Wheel Rollout
-E050,Mountain Climbers
-E051,Burpees
-E052,Jump Rope
-E053,High Knees
-E054,Sprint Intervals
-E055,Rowing Machine
-E056,Treadmill Run
-E057,Cycling
-E058,Stair Climber
-E059,Battle Ropes
-E060,Medicine Ball Slams
-E061,Farmer’s Carry
-E062,Sled Push
-E063,Box Jumps
-E064,Agility Ladder Drills
-E065,Tire Flips
-E066,Dynamic Stretch Circuit
-E067,Foam Rolling
-E068,Hip Flexor Stretch
-E069,Hamstring Stretch
-E070,Shoulder Mobility Band Work
-E071,Pec Deck
-E072,Assisted Pull-Up
-E073,Smith Machine Squat
-E074,Leg Extension
-E075,Calf Raises
-E076,Cable Woodchopper
-E077,Power Clean
-E078,Snatch
-E079,Push Press
-E080,Depth Jumps
+ID,Name,MuscleGroup,DifficultyLevel,Description
+E001,Barbell Bench Press,Chest,Intermediate,"Set feet flat and shoulder blades pulled back, lower the bar to mid-chest with elbows about 45 degrees, then press up while keeping wrists stacked and glutes on the bench."
+E002,Dumbbell Bench Press,Chest,Intermediate,"Plant feet, keep shoulder blades pinned, lower dumbbells under control to chest level, and press up evenly without letting wrists bend back or elbows flare hard."
+E003,Incline Dumbbell Press,Chest,Intermediate,"Set bench at 30-45 degrees, brace core, lower dumbbells to upper-chest line with forearms vertical, then press smoothly without arching your lower back."
+E004,Chest Fly (Dumbbell),Chest,Beginner,"Keep a slight elbow bend, open arms in a wide arc until chest feels a stretch, then squeeze back up with control while shoulders stay down and back."
+E005,Push-Ups,Chest,Beginner,"Start in a straight plank, lower chest between hands with elbows angled back, and press up while keeping hips level, neck neutral, and core tight."
+E006,Cable Chest Fly,Chest,Beginner,"Stand staggered and braced, bring handles together in a hugging arc, pause at center, and return slowly without shrugging or overextending shoulders."
+E007,Pull-Ups,Back,Advanced,"Hang with active shoulders, brace core, pull elbows toward ribs until chin clears the bar, and lower fully under control without swinging or kipping."
+E008,Lat Pulldown,Back,Beginner,"Sit tall with chest up, pull bar to upper chest by driving elbows down, and return slowly to full stretch without leaning far back or yanking."
+E009,Barbell Row,Back,Intermediate,"Hinge at hips with flat back, keep bar close, row toward lower ribs, and lower under control while maintaining a fixed torso and braced core."
+E010,Dumbbell Row,Back,Beginner,"Support your torso, keep spine neutral, pull elbow toward hip, and lower slowly while avoiding torso twist or shoulder shrug on each rep."
+E011,Seated Cable Row,Back,Beginner,"Sit tall with slight knee bend, pull handle to lower ribs by squeezing shoulder blades, then extend arms smoothly without rounding your back."
+E012,Face Pull,Back,Beginner,"Set cable at face height, pull rope toward nose with elbows high, rotate hands outward, and control the return while keeping ribs down."
+E013,T-Bar Row,Back,Intermediate,"Hinge with neutral spine and soft knees, pull handle to chest by driving elbows back, and lower with control without jerking from the lower back."
+E014,Inverted Row,Back,Beginner,"Keep body in a straight line, pull chest to bar by retracting shoulder blades, and lower fully with control without hips sagging."
+E015,Overhead Barbell Press,Shoulders,Intermediate,"Start with bar at upper chest, squeeze glutes and core, press straight overhead so biceps finish by ears, and lower under control without leaning back."
+E016,Dumbbell Shoulder Press,Shoulders,Beginner,"Sit or stand tall, press dumbbells overhead on a vertical path, and lower to shoulder level while keeping wrists neutral and core braced."
+E017,Lateral Raises,Shoulders,Beginner,"Raise arms out to shoulder height with soft elbows and thumbs slightly up, then lower slowly while keeping traps relaxed and torso still."
+E018,Front Raises,Shoulders,Beginner,"Lift weight to shoulder height with controlled tempo, keep ribs down and elbows soft, and avoid using body swing to start reps."
+E019,Rear Delt Fly,Shoulders,Beginner,"Hinge with flat back, raise arms out and slightly back from shoulders, pause briefly, and lower slowly without neck tension or momentum."
+E020,Arnold Press,Shoulders,Intermediate,"Start palms facing in at chin level, rotate and press overhead in one smooth path, then reverse slowly while keeping core tight and back neutral."
+E021,Barbell Curl,Biceps,Beginner,"Stand tall with elbows near sides, curl bar without swinging, squeeze at top, and lower fully under control while keeping wrists straight."
+E022,Dumbbell Curl,Biceps,Beginner,"Keep shoulders down and elbows fixed, curl with palms rotating up, and lower slowly to full extension without leaning back."
+E023,Hammer Curl,Biceps,Beginner,"Hold neutral grip, curl by bending elbows only, and lower with control while keeping upper arms still and posture upright."
+E024,Preacher Curl,Biceps,Beginner,"Set upper arms firmly on pad, curl through full range without lifting elbows, and lower slowly to maintain constant tension and joint control."
+E025,Tricep Dips,Triceps,Intermediate,"Grip bars with shoulders down, lower until elbows reach about 90 degrees, then press up without locking hard or letting shoulders roll forward."
+E026,Skull Crushers,Triceps,Intermediate,"Keep upper arms mostly vertical, bend elbows to lower weight near forehead, and extend back up smoothly without flaring elbows wide."
+E027,Cable Tricep Pushdown,Triceps,Beginner,"Pin elbows to sides, press handle down until arms are straight, pause briefly, and return slowly without shoulder movement or torso sway."
+E028,Overhead Tricep Extension,Triceps,Beginner,"Keep elbows pointed forward, lower weight behind head with control, and extend up while bracing core and avoiding lower-back arch."
+E029,Barbell Squat,Quads,Advanced,"Set bar across upper back, brace and sit down between hips with knees tracking toes, then drive up through mid-foot while keeping chest and spine stable."
+E030,Goblet Squat,Quads,Beginner,"Hold weight at chest, keep heels down and torso tall, descend until hips are below or near knee level, then stand by pushing knees out and hips through."
+E031,Leg Press,Quads,Beginner,"Place feet shoulder-width on platform, lower sled until knees are deeply bent but controlled, and press up without locking knees or lifting hips."
+E032,Walking Lunges,Quads,Intermediate,"Step long enough for both knees to bend about 90 degrees, keep torso upright, and push through front heel to move forward under control."
+E033,Bulgarian Split Squat,Quads,Intermediate,"Set rear foot on bench, keep front knee tracking over toes, lower straight down with slight forward torso lean, and drive up through front leg."
+E034,Step-Ups,Quads,Beginner,"Place full foot on box, lean slightly forward, drive through lead heel to stand tall, and step down softly without pushing off trailing leg."
+E035,Jump Squats,Quads,Advanced,"Squat with knees aligned over toes, explode upward with full hip extension, and land softly into the next rep with controlled knee and hip bend."
+E036,Wall Sit,Quads,Beginner,"Slide down until knees are near 90 degrees, keep back and head against wall, and hold with even foot pressure and steady breathing."
+E037,Romanian Deadlift,Hamstrings,Intermediate,"Hinge hips back with soft knees, keep bar close to thighs and spine neutral, lower until hamstrings stretch, then drive hips forward to stand."
+E038,Conventional Deadlift,Hamstrings,Advanced,"Set bar over mid-foot, brace, pull slack from bar, and stand by pushing floor away while keeping bar close and back neutral throughout."
+E039,Hip Thrust,Glutes,Intermediate,"Rest upper back on bench, tuck chin slightly, drive through heels to lift hips until torso is parallel, then lower under control without overarching."
+E040,Hamstring Curl,Hamstrings,Beginner,"Align knees with machine pivot, curl pad toward glutes without lifting hips, and lower slowly to full extension for controlled reps."
+E041,Glute Bridge,Glutes,Beginner,"Lie with feet hip-width and close to glutes, brace core, lift hips by squeezing glutes, and lower slowly without letting knees cave inward."
+E042,Kettlebell Swing,Hamstrings,Intermediate,"Hinge not squat, hike bell back, snap hips forward to chest height, and let bell return naturally while keeping back flat and shoulders packed."
+E043,Plank,Core,Beginner,"Stack shoulders over elbows, squeeze glutes and abs, keep body straight from head to heels, and breathe steadily without hips dropping or piking."
+E044,Side Plank,Core,Beginner,"Elbow under shoulder, hips lifted in one straight line, and hold while keeping neck neutral and top shoulder stacked over bottom shoulder."
+E045,Bicycle Crunch,Core,Beginner,"Keep low back lightly pressed down, rotate ribcage to opposite knee, and move slowly with full exhale each twist instead of pulling on neck."
+E046,Leg Raises,Core,Intermediate,"Keep lower back anchored, raise legs with controlled tempo, and lower only as far as you can maintain core tension without arching."
+E047,Russian Twist,Core,Beginner,"Sit tall with slight lean, brace core, rotate torso side to side from ribs, and keep movement controlled without rounding lower back."
+E048,Hanging Leg Raise,Core,Advanced,"Start from active hang, brace and lift legs by tilting pelvis up, pause briefly, and lower slowly without swinging."
+E049,Ab Wheel Rollout,Core,Advanced,"Brace abs and glutes, roll forward while keeping ribs tucked and back neutral, then pull back using core without letting hips sag."
+E050,Mountain Climbers,Cardio,Beginner,"Start in strong plank, drive one knee at a time toward chest, and keep shoulders stacked and hips level at a smooth, quick pace."
+E051,Burpees,Cardio,Intermediate,"Squat to floor with neutral spine, jump feet back to plank, return feet under hips, and jump up softly while keeping reps controlled."
+E052,Jump Rope,Cardio,Beginner,"Keep elbows close and rotate rope from wrists, jump low on balls of feet, and land softly with relaxed shoulders and steady rhythm."
+E053,High Knees,Cardio,Beginner,"Run tall with quick contacts, drive knees to hip height, pump arms naturally, and land under hips to reduce impact stress."
+E054,Sprint Intervals,Cardio,Advanced,"Warm up well, keep slight forward lean and active arm drive during sprints, then walk or jog recovery while maintaining clean mechanics."
+E055,Rowing Machine,Cardio,Beginner,"Sequence each stroke legs then hips then arms, return arms then hips then legs, and keep spine long without rounding at the catch."
+E056,Treadmill Run,Cardio,Beginner,"Run tall with slight forward lean from ankles, land under center of mass, and keep cadence steady without overstriding."
+E057,Cycling,Cardio,Beginner,"Set saddle for slight knee bend at bottom stroke, keep core engaged and shoulders relaxed, and pedal in smooth circles with stable hips."
+E058,Stair Climber,Cardio,Intermediate,"Stand upright with light hand support, place full foot on each step, and drive through heel while keeping knees aligned and pace consistent."
+E059,Battle Ropes,Full Body,Intermediate,"Set athletic stance with soft knees, brace core, create waves from shoulders and arms together, and keep spine neutral as tempo rises."
+E060,Medicine Ball Slams,Full Body,Intermediate,"Lift ball overhead with ribs down, slam by hinging and driving arms down forcefully, then catch safely with bent knees and neutral back."
+E061,Farmer's Carry,Full Body,Beginner,"Stand tall with weights at sides, pack shoulders down, take short controlled steps, and keep core braced without leaning or shrugging."
+E062,Sled Push,Full Body,Intermediate,"Lean slightly into sled with straight line from head to heel, drive knees forward in quick steps, and keep core tight throughout push."
+E063,Box Jumps,Full Body,Intermediate,"Use a quarter squat, swing arms and jump with both feet, land softly in athletic stance, then step down to reduce impact fatigue."
+E064,Agility Ladder Drills,Full Body,Beginner,"Stay on balls of feet with slight knee bend, use quick precise steps, and keep torso quiet while increasing speed gradually."
+E065,Tire Flips,Full Body,Advanced,"Set hips low with flat back, drive through legs to lift tire, then transition hands to push it over while keeping core braced."
+E066,Dynamic Stretch Circuit,Mobility,Beginner,"Move joints through controlled full ranges, keep breathing steady, and avoid bouncing or forcing end ranges during each drill."
+E067,Foam Rolling,Mobility,Beginner,"Roll slowly over tight areas, pause on tender spots for 20-30 seconds, and breathe deeply without rolling directly over joints."
+E068,Hip Flexor Stretch,Mobility,Beginner,"From half-kneel, tuck pelvis slightly and squeeze rear glute, then shift forward gently until front hip stretches without lower-back arch."
+E069,Hamstring Stretch,Mobility,Beginner,"Keep spine long and hinge at hips toward straight leg, stop at mild tension, and breathe slowly without rounding aggressively."
+E070,Shoulder Mobility Band Work,Mobility,Beginner,"Use light band tension, move shoulders through pain-free range with controlled tempo, and keep ribs down to avoid compensating through the back."
+E071,Pec Deck,Chest,Beginner,"Set seat so handles align with mid-chest, keep elbows slightly bent, bring arms together smoothly, and return slowly without shoulder shrugging."
+E072,Assisted Pull-Up,Back,Beginner,"Use enough assistance for full range, start from active hang, pull chest toward bar with elbows down, and lower under control each rep."
+E073,Smith Machine Squat,Quads,Beginner,"Set feet slightly ahead of bar path, brace core, squat to controlled depth with knees tracking toes, and stand without collapsing inward."
+E074,Leg Extension,Quads,Beginner,"Align knee joint with machine pivot, extend legs to near straight, pause briefly, and lower slowly without swinging or snapping knees."
+E075,Calf Raises,Calves,Beginner,"Press through big toe and ball of foot to rise fully, pause at top, and lower through full stretch with controlled ankle alignment."
+E076,Cable Woodchopper,Core,Intermediate,"Rotate through torso and hips together, keep arms mostly extended, and control both pull and return without twisting the lower back aggressively."
+E077,Power Clean,Full Body,Advanced,"Set neutral spine, push from legs, keep bar close through explosive hip extension, and catch on shoulders with elbows high and stable feet."
+E078,Snatch,Full Body,Advanced,"Start with wide grip and braced trunk, drive powerfully through hips, pull under fast, and receive overhead with locked elbows and stable core."
+E079,Push Press,Shoulders,Intermediate,"Dip straight down with upright torso, drive through legs to launch bar, then press to lockout while keeping ribs down and head through."
+E080,Depth Jumps,Full Body,Advanced,"Step off box under control, absorb landing with hips and knees aligned, then rebound quickly upward with minimal ground contact and soft mechanics."
