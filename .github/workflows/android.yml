@@ -1,75 +1,64 @@
-name: Android CI
+name: Android Emulator CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  build:
+  android-emulator:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     env:
-      ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
+      ANDROID_SDK_ROOT: $RUNNER_TEMP/android-sdk
+      ANDROID_HOME: $RUNNER_TEMP/android-sdk
+      PATH: $RUNNER_TEMP/android-sdk/cmdline-tools/latest/bin:$RUNNER_TEMP/android-sdk/emulator:$RUNNER_TEMP/android-sdk/platform-tools:$PATH
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Cache Gradle dependencies
-      - name: Cache Gradle
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-
-      # Install dependencies
-      - name: Setup JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: 17
-
-      - name: Install Android SDK
+      - name: Download Android Command Line Tools
         run: |
-          mkdir -p $ANDROID_SDK_ROOT
-          cd $ANDROID_SDK_ROOT
-          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
-          unzip cmdline-tools.zip
-          mkdir -p cmdline-tools/latest
-          mv cmdline-tools/* cmdline-tools/latest/
-          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses
-          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools" "platforms;android-33" "emulator" "system-images;android-33;google_apis;x86_64"
+          mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
+          cd $ANDROID_SDK_ROOT/cmdline-tools
+          curl -o commandlinetools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+          unzip commandlinetools.zip
+          mv cmdline-tools latest
 
-      # Create AVD
-      - name: Create Emulator
-        run: |
-          echo "no" | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager create avd -n test -k "system-images;android-33;google_apis;x86_64" --force
-          $ANDROID_SDK_ROOT/emulator/emulator -list-avds
+      - name: Accept SDK licenses
+        run: yes | sdkmanager --licenses
 
-      # Launch emulator in background
-      - name: Start Emulator
+      - name: Install SDK packages
         run: |
-          $ANDROID_SDK_ROOT/emulator/emulator -avd test -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -accel off &
-          echo "Waiting for emulator to start..."
-          $ANDROID_SDK_ROOT/platform-tools/adb wait-for-device
-          # Wait until boot complete
-          timeout=0
-          while [[ "$($ANDROID_SDK_ROOT/platform-tools/adb shell getprop sys.boot_completed | tr -d '\r')" != "1" ]]; do
+          sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" "system-images;android-30;google_apis;x86_64" "emulator"
+
+      - name: Create Android Virtual Device (AVD)
+        run: |
+          echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" -f
+
+      - name: Launch Emulator
+        run: |
+          nohup emulator -avd test -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -accel off &
+
+      - name: Wait for Emulator to boot
+        run: |
+          adb wait-for-device
+          boot_completed=""
+          until [ "$boot_completed" = "1" ]; do
             sleep 5
-            timeout=$((timeout + 5))
-            if [ $timeout -gt 300 ]; then
-              echo "Emulator boot timed out!"
-              exit 1
-            fi
+            boot_completed=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+            echo "Waiting for emulator to boot..."
           done
-          echo "Emulator started!"
+          adb devices
 
-      # Run Gradle build & tests
-      - name: Build & Test
-        run: |
-          ./gradlew build connectedCheck
+      - name: Build APK
+        run: ./gradlew assembleDebug
+
+      - name: Run Unit Tests
+        run: ./gradlew testDebug
+
+      - name: Run Instrumentation Tests on Emulator
+        run: ./gradlew connectedDebugAndroidTest
