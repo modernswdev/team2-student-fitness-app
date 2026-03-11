@@ -2,77 +2,74 @@ name: Android CI
 
 on:
   push:
-    branches: ["main"]
+    branches: [ main ]
   pull_request:
-    branches: ["main"]
+    branches: [ main ]
 
 jobs:
-  unit-tests:
-    name: Unit Tests
+  build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
+      # Cache Gradle dependencies
+      - name: Cache Gradle
+        uses: actions/cache@v3
         with:
-          distribution: temurin
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+
+      # Install dependencies
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
           java-version: 17
-          cache: gradle
 
-      - name: Make Gradle executable
-        run: chmod +x gradlew
+      - name: Install Android SDK
+        run: |
+          mkdir -p $ANDROID_SDK_ROOT
+          cd $ANDROID_SDK_ROOT
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
+          unzip cmdline-tools.zip
+          mkdir -p cmdline-tools/latest
+          mv cmdline-tools/* cmdline-tools/latest/
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses
+          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools" "platforms;android-33" "emulator" "system-images;android-33;google_apis;x86_64"
 
-      - name: Run unit tests
-        run: ./gradlew testDebugUnitTest
+      # Create AVD
+      - name: Create Emulator
+        run: |
+          echo "no" | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager create avd -n test -k "system-images;android-33;google_apis;x86_64" --force
+          $ANDROID_SDK_ROOT/emulator/emulator -list-avds
 
-      - name: Upload unit test report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: unit-test-report
-          path: app/build/reports/tests/
+      # Launch emulator in background
+      - name: Start Emulator
+        run: |
+          $ANDROID_SDK_ROOT/emulator/emulator -avd test -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -accel off &
+          echo "Waiting for emulator to start..."
+          $ANDROID_SDK_ROOT/platform-tools/adb wait-for-device
+          # Wait until boot complete
+          timeout=0
+          while [[ "$($ANDROID_SDK_ROOT/platform-tools/adb shell getprop sys.boot_completed | tr -d '\r')" != "1" ]]; do
+            sleep 5
+            timeout=$((timeout + 5))
+            if [ $timeout -gt 300 ]; then
+              echo "Emulator boot timed out!"
+              exit 1
+            fi
+          done
+          echo "Emulator started!"
 
-  instrumentation-tests:
-    name: Android Instrumentation Tests
-    runs-on: ubuntu-latest
-    needs: unit-tests
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-          cache: gradle
-
-      - name: Make Gradle executable
-        run: chmod +x gradlew
-
-      - name: Run Android emulator tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 30
-          target: google_apis
-          arch: x86_64
-          profile: Nexus 6
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
-          disable-animations: true
-          emulator-boot-timeout: 900
-          script: |
-            echo "Waiting for device to be ready..."
-            adb wait-for-device
-            adb shell input keyevent 82
-            ./gradlew connectedDebugAndroidTest
-
-      - name: Upload instrumentation test report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-test-report
-          path: app/build/reports/androidTests/
+      # Run Gradle build & tests
+      - name: Build & Test
+        run: |
+          ./gradlew build connectedCheck
