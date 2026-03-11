@@ -10,83 +10,40 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    timeout-minutes: 40
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repo
+      uses: actions/checkout@v4
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-          cache: gradle
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 17
+        cache: gradle
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+    - name: Grant gradlew permission
+      run: chmod +x gradlew
 
-      - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses
+    - name: Run unit tests
+      run: ./gradlew test
 
-      - name: Install Android SDK components
-        run: |
-          sdkmanager "platform-tools"
-          sdkmanager "platforms;android-34"
-          sdkmanager "build-tools;34.0.0"
-          sdkmanager "system-images;android-34;google_apis;x86_64"
+    - name: Start ADB
+      run: |
+        adb start-server
+        adb devices
 
-      - name: Make gradlew executable
-        run: chmod +x gradlew
-
-      # ----------------------------
-      # Run JVM unit tests
-      # ----------------------------
-
-      - name: Run unit tests
-        run: ./gradlew testDebugUnitTest
-
-      # ----------------------------
-      # Build app and test APKs
-      # ----------------------------
-
-      - name: Build Debug APK and Test APK
-        run: ./gradlew assembleDebug assembleDebugAndroidTest
-
-      # ----------------------------
-      # Run Android instrumentation tests
-      # ----------------------------
-
-      - name: Run instrumentation tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 30
-          emulator-boot-timeout: 900
-          target: google_apis
-          arch: x86_64
-          profile: Nexus 6
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot -camera-back none
-          disable-animations: true
-          script: |
-            adb kill-server
-            adb start-server
-            adb wait-for-device
-      
-            echo "Waiting for emulator to boot..."
-            until adb shell getprop sys.boot_completed | grep -m 1 "1"; do
-              sleep 5
-            done
-      
-            adb shell input keyevent 82
-      
-            ./gradlew connectedDebugAndroidTest
-
-      # ----------------------------
-      # Upload APK artifact
-      # ----------------------------
-
-      - name: Upload Debug APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+    - name: Run instrumentation tests
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 30
+        target: google_apis
+        arch: x86_64
+        profile: Nexus 6
+        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
+        disable-animations: true
+        emulator-boot-timeout: 900
+        script: |
+          adb wait-for-device
+          adb shell input keyevent 82
+          ./gradlew connectedDebugAndroidTest
