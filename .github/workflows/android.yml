@@ -2,58 +2,53 @@ name: Android CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest  # GitHub-hosted runner
+    runs-on: ubuntu-latest
+
     env:
-      ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
+      JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
 
     steps:
-      # Checkout your repo
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Install required packages
-      - name: Install Dependencies
+      - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y wget unzip curl lib32stdc++6 lib32z1 qemu-kvm
 
-      # Install Android SDK command line tools
-      - name: Download Android SDK
+      - name: Set up Android SDK
         run: |
+          ANDROID_SDK_ROOT="${RUNNER_TEMP}/android-sdk"
           mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
           curl -o sdk-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
           unzip sdk-tools.zip -d $ANDROID_SDK_ROOT/cmdline-tools
           mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest
           rm sdk-tools.zip
 
-      # Accept licenses
-      - name: Accept Android Licenses
-        run: yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+          echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> $GITHUB_PATH
 
-      # Install platform tools & emulator
-      - name: Install Platform & Emulator
+      - name: Accept SDK licenses
         run: |
-          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-30" "emulator" "system-images;android-30;google_apis;x86_64"
+          yes | sdkmanager --licenses
 
-      # Create AVD
-      - name: Create AVD
+      - name: Install SDK packages
         run: |
-          echo "no" | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
+          sdkmanager "platform-tools" "platforms;android-30" "system-images;android-30;google_apis;x86_64" "emulator"
 
-      # Start emulator
-      - name: Start Emulator
+      - name: Create and start emulator
         run: |
-          $ANDROID_SDK_ROOT/emulator/emulator -avd test -no-window -gpu swiftshader_indirect -no-audio -no-snapshot &
+          echo no | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
+          $ANDROID_SDK_ROOT/emulator/emulator -avd test -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -accel off &
           adb wait-for-device
           adb shell input keyevent 82  # unlock device
 
-      # Run your tests
-      - name: Run Instrumentation Tests
+      - name: Run Tests
         run: |
           ./gradlew connectedAndroidTest
