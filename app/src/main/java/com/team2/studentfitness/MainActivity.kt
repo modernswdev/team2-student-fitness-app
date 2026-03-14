@@ -22,6 +22,10 @@ import com.team2.studentfitness.ui.theme.StudentFitnessTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Initialize database
+        (application as DatabaseCreation).database
+
         enableEdgeToEdge()
         setContent {
             StudentFitnessTheme {
