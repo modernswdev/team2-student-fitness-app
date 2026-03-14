@@ -19,6 +19,9 @@ interface SettingsDao {
     @Delete()
     suspend fun delete(userSettings: UserSettings)
 
+    @Query("SELECT name FROM usersettings WHERE uid = :uid")
+    suspend fun getName(uid: Int): String
+
     //Check current theme
     @Query("SELECT theme FROM usersettings WHERE uid = :uid")
     suspend fun getTheme(uid: Int): Int
