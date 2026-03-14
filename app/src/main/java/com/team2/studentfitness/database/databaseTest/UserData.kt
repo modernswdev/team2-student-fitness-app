@@ -16,4 +16,3 @@ data class User (
     @ColumnInfo(name = "loginCount")
     val loginCount: Int
 )
-

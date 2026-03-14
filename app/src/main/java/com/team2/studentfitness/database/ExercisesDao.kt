@@ -8,21 +8,26 @@ import androidx.room.Delete
 @Dao
 interface ExercisesDao {
     @Query("SELECT * FROM Exercises")
-    fun getAll(): List<Exercises>
+    suspend fun getAll(): List<Exercises>
 
     @Query("SELECT * FROM Exercises WHERE uid = :uid")
-    fun getById(uid: Int): Exercises
+    suspend fun getById(uid: Int): Exercises
 
     @Query("SELECT * FROM Exercises WHERE name = :name")
-    fun getByName(name: String): List<Exercises>
+    suspend fun getByName(name: String): List<Exercises>
+
+    @Query("SELECT * FROM Exercises WHERE muscleGroup = :muscleGroup")
+    suspend fun getByMuscleGroup(muscleGroup: String): List<Exercises>
+
+    @Query("SELECT * FROM Exercises WHERE difficulty = :difficulty")
+    suspend fun getByDifficulty(difficulty: Int): List<Exercises>
 
     @Insert()
-    fun insert(workouts: Exercises)
+    suspend fun insert(workouts: Exercises)
 
     @Delete()
-    fun delete(workouts: Exercises)
+    suspend fun delete(workouts: Exercises)
 
     @Query("DELETE FROM Exercises WHERE uid = :uid")
-    fun deleteById(uid: Int)
-
+    suspend fun deleteById(uid: Int)
 }

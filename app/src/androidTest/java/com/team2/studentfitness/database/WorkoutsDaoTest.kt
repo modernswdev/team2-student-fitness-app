@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -34,8 +35,7 @@ class WorkoutsDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun insertAndGetAllWorkouts() {
+    fun insertAndGetAllWorkouts() = runTest {
         val workout = Workouts(
             uid = 1,
             name = "Morning Yoga",
@@ -52,8 +52,7 @@ class WorkoutsDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun getByIdAndName() {
+    fun getByIdAndName() = runTest {
         val workout = Workouts(1, "Running", 45, "Cardio", 1, 1, "Legs")
         workoutsDao.insert(workout)
 
@@ -67,8 +66,7 @@ class WorkoutsDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun filterQueries() {
+    fun filterQueries() = runTest {
         val w1 = Workouts(1, "W1", 20, "F1", 0, 0, "S1")
         val w2 = Workouts(2, "W2", 40, "F2", 1, 1, "S2")
         workoutsDao.insert(w1)
@@ -82,8 +80,7 @@ class WorkoutsDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun getIndividualFields() {
+    fun getIndividualFields() = runTest {
         val workout = Workouts(1, "Strength", 60, "Upper", 2, 2, "Push")
         workoutsDao.insert(workout)
 
@@ -95,8 +92,7 @@ class WorkoutsDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun deleteWorkouts() {
+    fun deleteWorkouts() = runTest {
         val w1 = Workouts(1, "W1", 20, "F1", 0, 0, "S1")
         val w2 = Workouts(2, "W2", 40, "F2", 1, 1, "S2")
         workoutsDao.insert(w1)

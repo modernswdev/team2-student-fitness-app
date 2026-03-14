@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -34,8 +35,7 @@ class WorkExDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun insertAndGetAllWorkEx() {
+    fun insertAndGetAllWorkEx() = runTest {
         val workEx = WorkEx(
             uid = 1,
             workoutName = "Morning Routine",
@@ -53,8 +53,7 @@ class WorkExDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun getByIdAndName() {
+    fun getByIdAndName() = runTest {
         val workEx = WorkEx(1, "Bench Press Session", 101, 202, 8, 4, 90, 2)
         workExDao.insert(workEx)
 
@@ -68,8 +67,7 @@ class WorkExDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun updateMethods() {
+    fun updateMethods() = runTest {
         val workEx = WorkEx(1, "Test Workout", 1, 1, 10, 3, 60, 1)
         workExDao.insert(workEx)
 
@@ -87,8 +85,7 @@ class WorkExDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun deleteWorkEx() {
+    fun deleteWorkEx() = runTest {
         val we1 = WorkEx(1, "W1", 1, 1, 10, 3, 60, 1)
         val we2 = WorkEx(2, "W2", 1, 2, 10, 3, 60, 2)
         workExDao.insert(we1)
