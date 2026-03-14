@@ -40,6 +40,7 @@ fun Dashboard(navController: NavController) {
 
     LaunchedEffect(Unit) {
         // Using uid 1000 from the pre-populated dummyusersettings.csv
+        // For actual integration, should pull uid of currently logged-in user
         try {
             userName = settingsDao.getName(1000)
         } catch (e: Exception) {
