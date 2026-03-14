@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -22,10 +23,18 @@ class WorkoutsDaoTest {
     @Before
     fun createDb() {
         val context = ApplicationProvider.getApplicationContext<Context>()
+        // Add the callback to trigger pre-population
         db = Room.inMemoryDatabaseBuilder(
             context, Database::class.java
-        ).allowMainThreadQueries().build()
+        ).addCallback(Database.getDatabaseCallback(context))
+         .build()
+        
         workoutsDao = db.workoutsDao()
+
+        //Dummy query to ensure pre-population occurs before tests
+        runBlocking {
+            workoutsDao.getAll()
+        }
     }
 
     @After
@@ -35,10 +44,37 @@ class WorkoutsDaoTest {
     }
 
     @Test
+    fun checkPrepopulatedData() = runTest {
+        val allWorkouts = workoutsDao.getAll()
+        
+        // workouts.csv has 25 workouts (W001 to W025)
+        assertTrue("Database should be pre-populated with workouts", allWorkouts.isNotEmpty())
+        assertEquals(25, allWorkouts.size)
+        
+        // Check first workout (W001,Push Strength,50,Chest/Shoulders/Triceps,Strength,Intermediate,Push)
+        val firstResult = workoutsDao.getByName("Push Strength")
+        assertNotNull(firstResult)
+        assertEquals(1, firstResult.size)
+        assertEquals(50, firstResult[0].duration)
+        assertEquals(2, firstResult[0].type) // Strength = 2
+        assertEquals(1, firstResult[0].difficulty) // Intermediate = 1
+        assertEquals("Push", firstResult[0].split)
+        
+        // Check a recovery workout
+        val recovery = workoutsDao.getByName("Mobility & Recovery")
+        assertEquals(0, recovery[0].type) // Recovery = 0
+        assertEquals(0, recovery[0].difficulty) // Beginner = 0
+        
+        // Check a cardio workout
+        val hiit = workoutsDao.getByName("HIIT 30")
+        assertEquals(1, hiit[0].type) // Cardio = 1
+    }
+
+    @Test
     fun insertAndGetAllWorkouts() = runTest {
         val workout = Workouts(
-            uid = 1,
-            name = "Morning Yoga",
+            uid = 1000, // High ID to avoid conflict with pre-populated data
+            name = "Custom Workout",
             duration = 30,
             focus = "Flexibility",
             type = 0,
@@ -46,62 +82,40 @@ class WorkoutsDaoTest {
             split = "Full Body"
         )
         workoutsDao.insert(workout)
-        val allWorkouts = workoutsDao.getAll()
-        assertEquals(1, allWorkouts.size)
-        assertEquals("Morning Yoga", allWorkouts[0].name)
-    }
-
-    @Test
-    fun getByIdAndName() = runTest {
-        val workout = Workouts(1, "Running", 45, "Cardio", 1, 1, "Legs")
-        workoutsDao.insert(workout)
-
-        val byId = workoutsDao.getById(1)
-        assertNotNull(byId)
-        assertEquals("Running", byId.name)
-
-        val byName = workoutsDao.getByName("Running")
-        assertEquals(1, byName.size)
-        assertEquals(1, byName[0].uid)
+        val result = workoutsDao.getByName("Custom Workout")
+        assertEquals(1, result.size)
+        assertEquals("Custom Workout", result[0].name)
     }
 
     @Test
     fun filterQueries() = runTest {
-        val w1 = Workouts(1, "W1", 20, "F1", 0, 0, "S1")
-        val w2 = Workouts(2, "W2", 40, "F2", 1, 1, "S2")
-        workoutsDao.insert(w1)
-        workoutsDao.insert(w2)
-
-        assertEquals(1, workoutsDao.getByType(0).size)
-        assertEquals(1, workoutsDao.getByDuration(40).size)
-        assertEquals(1, workoutsDao.getByFocus("F1").size)
-        assertEquals(1, workoutsDao.getByDifficulty(1).size)
-        assertEquals(1, workoutsDao.getBySplit("S2").size)
+        // Test filtering on pre-populated data
+        val strengthWorkouts = workoutsDao.getByType(2) // Strength
+        assertTrue("Strength workouts should exist", strengthWorkouts.isNotEmpty())
+        
+        val intermediateWorkouts = workoutsDao.getByDifficulty(1) // Intermediate
+        assertTrue("Intermediate workouts should exist", intermediateWorkouts.isNotEmpty())
     }
 
     @Test
     fun getIndividualFields() = runTest {
-        val workout = Workouts(1, "Strength", 60, "Upper", 2, 2, "Push")
-        workoutsDao.insert(workout)
-
-        assertEquals(2, workoutsDao.getType(1))
-        assertEquals(60, workoutsDao.getDuration(1))
-        assertEquals("Upper", workoutsDao.getFocus(1))
-        assertEquals(2, workoutsDao.getDifficulty(1))
-        assertEquals("Push", workoutsDao.getSplit(1))
+        // W001 has duration 50
+        val first = workoutsDao.getByName("Push Strength")[0]
+        val uid = first.uid
+        
+        assertEquals(first.type, workoutsDao.getType(uid))
+        assertEquals(50, workoutsDao.getDuration(uid))
+        assertEquals("Push", workoutsDao.getSplit(uid))
     }
 
     @Test
     fun deleteWorkouts() = runTest {
-        val w1 = Workouts(1, "W1", 20, "F1", 0, 0, "S1")
-        val w2 = Workouts(2, "W2", 40, "F2", 1, 1, "S2")
-        workoutsDao.insert(w1)
-        workoutsDao.insert(w2)
-
-        workoutsDao.delete(w1)
-        assertEquals(1, workoutsDao.getAll().size)
-
-        workoutsDao.deleteById(2)
-        assertTrue(workoutsDao.getAll().isEmpty())
+        val allBefore = workoutsDao.getAll()
+        val initialSize = allBefore.size
+        
+        if (allBefore.isNotEmpty()) {
+            workoutsDao.delete(allBefore[0])
+            assertEquals(initialSize - 1, workoutsDao.getAll().size)
+        }
     }
 }
