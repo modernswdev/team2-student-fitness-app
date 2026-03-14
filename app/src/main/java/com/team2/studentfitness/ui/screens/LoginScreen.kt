@@ -22,11 +22,18 @@ import androidx.compose.ui.unit.sp
 import com.team2.studentfitness.ui.theme.LoginBackground
 import com.team2.studentfitness.ui.theme.LoginOrange
 import com.team2.studentfitness.ui.theme.LoginInputBg
+import com.team2.studentfitness.viewmodels.LoginViewModel
 
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier, onOpenDevMenu: () -> Unit = {}) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+fun LoginScreen(
+    viewModel: LoginViewModel,
+    modifier: Modifier = Modifier,
+    onLoginSuccess: () -> Unit = {},
+    onOpenDevMenu: () -> Unit = {}
+) {
+    var pin by remember { mutableStateOf("") }
+    val isPinSet = viewModel.isPinSet()
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Box(
         modifier = modifier
@@ -62,38 +69,26 @@ fun LoginScreen(modifier: Modifier = Modifier, onOpenDevMenu: () -> Unit = {}) {
 
             // FORM SECTION
             Column(modifier = Modifier.fillMaxWidth(0.9f)) {
-                // Email Input
-                Text("Email Address", color = Color.Black, fontSize = 14.sp)
-                Spacer(modifier = Modifier.height(8.dp))
-                TextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("name@example.com", color = Color.Gray) },
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = LoginInputBg,
-                        unfocusedContainerColor = LoginInputBg,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    singleLine = true
+                Text(
+                    text = if (isPinSet) "Enter Your PIN" else "Create a Security PIN",
+                    color = Color.Black,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
                 )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Password Input
-                Text("Password", color = Color.Black, fontSize = 14.sp)
                 Spacer(modifier = Modifier.height(8.dp))
+                
                 TextField(
-                    value = password,
-                    onValueChange = { password = it },
+                    value = pin,
+                    onValueChange = { 
+                        if (it.length <= 6 && it.all { char -> char.isDigit() }) {
+                            pin = it
+                            errorMessage = null
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("••••••••", color = Color.Gray) },
+                    placeholder = { Text("••••", color = Color.Gray) },
                     visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = LoginInputBg,
                         unfocusedContainerColor = LoginInputBg,
@@ -105,17 +100,52 @@ fun LoginScreen(modifier: Modifier = Modifier, onOpenDevMenu: () -> Unit = {}) {
                     shape = RoundedCornerShape(8.dp),
                     singleLine = true
                 )
+
+                if (errorMessage != null) {
+                    Text(
+                        text = errorMessage!!,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Sign In Button
+                // Action Button
                 Button(
-                    onClick = { /* Handle Login */ },
+                    onClick = {
+                        val pinInt = pin.toIntOrNull()
+                        if (pinInt != null) {
+                            if (isPinSet) {
+                                if (viewModel.pinUnlock(pinInt)) {
+                                    onLoginSuccess()
+                                } else {
+                                    errorMessage = "Incorrect PIN. Please try again."
+                                }
+                            } else {
+                                if (pin.length >= 4) {
+                                    viewModel.setPin(pinInt)
+                                    onLoginSuccess()
+                                } else {
+                                    errorMessage = "PIN must be at least 4 digits."
+                                }
+                            }
+                        } else {
+                            errorMessage = "Please enter a valid numeric PIN."
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = LoginOrange),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
+                    enabled = pin.isNotEmpty()
                 ) {
-                    Text("Sign In", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(
+                        text = if (isPinSet) "Sign In" else "Set PIN & Continue",
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
                 }
 
                 // Bypass Button (Dev Only)
@@ -132,9 +162,9 @@ fun LoginScreen(modifier: Modifier = Modifier, onOpenDevMenu: () -> Unit = {}) {
                 modifier = Modifier.fillMaxWidth(0.9f).padding(vertical = 24.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Divider(modifier = Modifier.weight(1f), color = Color.DarkGray.copy(alpha = 0.5f))
+                HorizontalDivider(modifier = Modifier.weight(1f), color = Color.DarkGray.copy(alpha = 0.5f))
                 Text(" OR ", modifier = Modifier.padding(horizontal = 10.dp), color = Color.Black, fontSize = 12.sp)
-                Divider(modifier = Modifier.weight(1f), color = Color.DarkGray.copy(alpha = 0.5f))
+                HorizontalDivider(modifier = Modifier.weight(1f), color = Color.DarkGray.copy(alpha = 0.5f))
             }
 
             // GOOGLE BUTTON
@@ -151,16 +181,27 @@ fun LoginScreen(modifier: Modifier = Modifier, onOpenDevMenu: () -> Unit = {}) {
             Spacer(modifier = Modifier.height(32.dp))
 
             // FOOTER
-            Text(
-                text = buildAnnotatedString {
-                    append("New here? ")
-                    withStyle(style = SpanStyle(color = LoginOrange, fontWeight = FontWeight.Bold)) {
-                        append("Create an account")
-                    }
-                },
-                color = Color.Black,
-                fontSize = 14.sp
-            )
+            if (isPinSet) {
+                TextButton(onClick = { /* Handle Forgot PIN */ }) {
+                    Text(
+                        text = "Forgot PIN?",
+                        color = LoginOrange,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    )
+                }
+            } else {
+                Text(
+                    text = buildAnnotatedString {
+                        append("Secure your account with a ")
+                        withStyle(style = SpanStyle(color = LoginOrange, fontWeight = FontWeight.Bold)) {
+                            append("Personal PIN")
+                        }
+                    },
+                    color = Color.Black,
+                    fontSize = 14.sp
+                )
+            }
         }
     }
 }

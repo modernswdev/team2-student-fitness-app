@@ -23,6 +23,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.team2.studentfitness.R
+import com.team2.studentfitness.ui.theme.Teal
+import com.team2.studentfitness.ui.theme.Mint
+import com.team2.studentfitness.ui.theme.Orange
+import com.team2.studentfitness.ui.theme.StudentFitnessTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,7 +68,7 @@ fun Dashboard(navController: NavController) {
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = _root_ide_package_.com.team2.studentfitness.ui.theme.Teal,
+                    containerColor = Teal,
                     titleContentColor = Color.White
                 )
             )
@@ -85,7 +89,7 @@ fun Dashboard(navController: NavController) {
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
                 placeholder = { Text("Search metrics...", color = Color.Gray) },
-                leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = "Search", tint = _root_ide_package_.com.team2.studentfitness.ui.theme.Teal) },
+                leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = "Search", tint = Teal) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -93,7 +97,7 @@ fun Dashboard(navController: NavController) {
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
                     unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = _root_ide_package_.com.team2.studentfitness.ui.theme.Teal,
+                    focusedIndicatorColor = Teal,
                     unfocusedIndicatorColor = Color.Transparent
                 ),
                 singleLine = true
@@ -103,37 +107,37 @@ fun Dashboard(navController: NavController) {
                 text = "Smart Health Metrics",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = _root_ide_package_.com.team2.studentfitness.ui.theme.Teal,
+                color = Teal,
                 modifier = Modifier.padding(top = 24.dp, bottom = 12.dp)
             )
 
             // METRIC CARDS
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    HealthMetricCard(title = "Heart Rate", value = "70 bpm", color = _root_ide_package_.com.team2.studentfitness.ui.theme.Mint, modifier = Modifier.weight(1f)) {
+                    HealthMetricCard(title = "Heart Rate", value = "70 bpm", color = Mint, modifier = Modifier.weight(1f)) {
                         navController.navigate("detail/Heart Rate")
                     }
-                    HealthMetricCard(title = "Calories Burned", value = "430 kcal", color = _root_ide_package_.com.team2.studentfitness.ui.theme.Orange, modifier = Modifier.weight(1f)) {
+                    HealthMetricCard(title = "Calories Burned", value = "430 kcal", color = Orange, modifier = Modifier.weight(1f)) {
                         navController.navigate("detail/Calories")
                     }
                 }
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    HealthMetricCard(title = "Gym Hours", value = "8am-10pm", color = _root_ide_package_.com.team2.studentfitness.ui.theme.Teal, modifier = Modifier.weight(1f)) {
+                    HealthMetricCard(title = "Gym Hours", value = "8am-10pm", color = Teal, modifier = Modifier.weight(1f)) {
                         navController.navigate("detail/Gym Hours")
                     }
-                    HealthMetricCard(title = "Workout Timer", value = "30 min", color = _root_ide_package_.com.team2.studentfitness.ui.theme.Orange, modifier = Modifier.weight(1f)) {
+                    HealthMetricCard(title = "Workout Timer", value = "30 min", color = Orange, modifier = Modifier.weight(1f)) {
                         navController.navigate("detail/Workout Timer")
                     }
                 }
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    HealthMetricCard(title = "Protein Intake", value = "80g / 120g", color = _root_ide_package_.com.team2.studentfitness.ui.theme.Orange, modifier = Modifier.weight(1f)) {
+                    HealthMetricCard(title = "Protein Intake", value = "80g / 120g", color = Orange, modifier = Modifier.weight(1f)) {
                         navController.navigate("detail/Protein Intake")
                     }
-                    HealthMetricCard(title = "Workout Tutorials", value = "Learn", color = _root_ide_package_.com.team2.studentfitness.ui.theme.Mint, modifier = Modifier.weight(1f)) {
+                    HealthMetricCard(title = "Workout Tutorials", value = "Learn", color = Mint, modifier = Modifier.weight(1f)) {
                         navController.navigate("detail/Workout Tutorials")
                     }
                 }
-                HealthMetricCard(title = "Mental Health", value = "Breathing", color = _root_ide_package_.com.team2.studentfitness.ui.theme.Teal, modifier = Modifier.fillMaxWidth()) {
+                HealthMetricCard(title = "Mental Health", value = "Breathing", color = Teal, modifier = Modifier.fillMaxWidth()) {
                     navController.navigate("detail/Mental Health")
                 }
             }
@@ -171,7 +175,7 @@ fun HealthMetricCard(title: String, value: String, color: Color, modifier: Modif
 @Preview(showBackground = true)
 @Composable
 fun DashboardPreview() {
-    _root_ide_package_.com.team2.studentfitness.ui.theme.StudentFitnessTheme {
+    StudentFitnessTheme {
         Dashboard(navController = rememberNavController())
     }
 }
