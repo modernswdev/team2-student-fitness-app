@@ -121,21 +121,17 @@ header {
     cursor: pointer;
 }
 
-.resource-item {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    background: var(--card-bg);
+/* Journal Styling Restored */
+.history-item {
+    background: white;
     padding: 15px;
-    border-radius: 16px;
-    margin-bottom: 12px;
-    border-left: 4px solid var(--mental-accent);
-    color: inherit;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    border-left: 4px solid var(--accent);
 }
 
-.resource-item .icon { font-size: 1.5rem; margin-right: 15px; }
-
-/* SVG Progress */
-.circular-chart { width: 70px; height: 70px; }
-.circle-bg { fill: none; stroke: rgba(255,255,255,0.2); stroke-width: 3.5; }
-.circle { fill: none; stroke: white; stroke-width: 3.5; stroke-linecap: round; }
+.history-item small {
+    color: #888;
+    display: block;
+    margin-bottom: 5px;
+}
