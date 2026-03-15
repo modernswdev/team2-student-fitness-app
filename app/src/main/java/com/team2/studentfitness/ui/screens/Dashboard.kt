@@ -1,4 +1,4 @@
-package com.team2.studentfitness.ui.theme
+package com.team2.studentfitness.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

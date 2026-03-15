@@ -83,17 +83,19 @@ class ExercisesDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun deleteExercises() {
-        val e1 = Exercises(uid = 1, workoutName = "Plank")
-        val e2 = Exercises(uid = 2, workoutName = "Lunge")
+    fun deleteExercises() = runTest {
+        val initialSize = exercisesDao.getAll().size
+        val e1 = Exercises(uid = 1002, name = "Plank", muscleGroup = "Core", difficulty = 0, description = "Description")
+        val e2 = Exercises(uid = 1003, name = "Lunge", muscleGroup = "Legs", difficulty = 1, description = "Description")
         exercisesDao.insert(e1)
         exercisesDao.insert(e2)
 
-        exercisesDao.delete(e1)
-        assertEquals(1, exercisesDao.getAll().size)
+        assertEquals(initialSize + 2, exercisesDao.getAll().size)
 
-        exercisesDao.deleteById(2)
-        assertTrue(exercisesDao.getAll().isEmpty())
+        exercisesDao.delete(e1)
+        assertEquals(initialSize + 1, exercisesDao.getAll().size)
+
+        exercisesDao.deleteById(1003)
+        assertEquals(initialSize, exercisesDao.getAll().size)
     }
 }
