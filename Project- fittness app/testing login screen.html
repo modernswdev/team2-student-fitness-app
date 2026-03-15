@@ -3,44 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fitness App - Login</title>
+    <title>Scholar Strong - Login</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="Dashboard Style.css">
 </head>
 <body>
-    <div class="login-container">
+    <div class="phone-container" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
         <header class="hero-section">
-            <h1>SCHOLAR STRONG</h1>
-            <p>Push both your physical and mental limits.</p>
+            <h1 style="font-style: italic; font-weight: bold; color: var(--accent); font-size: 2.5rem; margin-bottom: 10px;">SCHOLAR STRONG</h1>
+            <p style="color: white; opacity: 0.8;">Local Access System</p>
         </header>
 
-        <main class="form-section">
-            <form id="loginForm">
-                <div class="input-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" placeholder="name@example.com" required>
-                </div>
-
-                <div class="input-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="••••••••" required>
-                </div>
-
-                <button type="submit" class="btn-primary">Sign In</button>
-            </form>
-
-            <div class="divider">
-                <span>OR</span>
+        <main class="form-section" style="width: 100%;">
+            <div class="pin-display">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
             </div>
 
-            <button class="btn-social">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
-                Continue with Google
-            </button>
+            <div class="keypad">
+                <button class="key" onclick="pressKey(1)">1</button>
+                <button class="key" onclick="pressKey(2)">2</button>
+                <button class="key" onclick="pressKey(3)">3</button>
+                <button class="key" onclick="pressKey(4)">4</button>
+                <button class="key" onclick="pressKey(5)">5</button>
+                <button class="key" onclick="pressKey(6)">6</button>
+                <button class="key" onclick="pressKey(7)">7</button>
+                <button class="key" onclick="pressKey(8)">8</button>
+                <button class="key" onclick="pressKey(9)">9</button>
+                <button class="key" style="color: #ff6b6b;" onclick="clearPin()">C</button>
+                <button class="key" onclick="pressKey(0)">0</button>
+                <button class="key" style="color: var(--accent); font-size: 1rem;" onclick="submitPin()">Go</button>
+            </div>
 
-            <p class="footer-text">
-                New here? <a href="#">Create an account</a>
+            <p class="footer-text" style="margin-top: 30px; color: white;">
+                New User? <a href="#" onclick="setNewPin()" style="color: var(--accent); font-weight: bold; text-decoration: none;">Create PIN</a>
             </p>
         </main>
     </div>
+
+    <script>
+        let pin = "";
+        const dots = document.querySelectorAll('.dot');
+
+        function pressKey(num) {
+            if (pin.length < 4) {
+                pin += num;
+                updateDots();
+            }
+            if (pin.length === 4) {
+                setTimeout(submitPin, 200);
+            }
+        }
+
+        function updateDots() {
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index < pin.length);
+            });
+        }
+
+        function clearPin() {
+            pin = "";
+            updateDots();
+        }
+
+        function submitPin() {
+            const savedPin = localStorage.getItem('userPin') || "1234";
+            if (pin === savedPin) {
+                window.location.href = "Dashboard UI.html";
+            } else {
+                alert("Incorrect PIN. Try 1234 or create a new one.");
+                clearPin();
+            }
+        }
+
+        function setNewPin() {
+            const val = prompt("Enter a new 4-digit PIN:");
+            if(val && val.length === 4 && !isNaN(val)) {
+                localStorage.setItem('userPin', val);
+                alert("New PIN set!");
+            }
+        }
+    </script>
 </body>
 </html>
