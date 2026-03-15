@@ -1,7 +1,7 @@
 :root {
-    --bg-color: #078c8c; /* Neon Teal */
+    --bg-color: #078c8c; /* Original Neon Teal */
     --card-bg: #f7eeee;
-    --accent-color: #f2a444; /* Neon Orange */  
+    --accent-color: #f2a444; /* Original Neon Orange */  
     --text-main: #ffffff;
     --text-dim: #070707;
 }
@@ -14,115 +14,101 @@
 }
 
 body {
-    background-color: var(--bg-color);
-    color: var(--text-main);
+    background-color: #333; /* Dark desk background to match dashboard */
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    color: var(--text-main);
 }
 
+/* Updated to use the phone-container class for consistency */
 .login-container {
-    width: 100%;
-    max-width: 400px;
+    width: 360px;
+    height: 740px;
+    background-color: var(--bg-color);
+    border-radius: 40px;
     padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    text-align: center;
 }
 
 .hero-section {
-    text-align: center;
     margin-bottom: 3rem;
 }
 
 .hero-section h1 {
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-style: italic;
     font-weight: bold;
     letter-spacing: -1px;
     color: var(--accent-color);
+    margin-bottom: 10px;
 }
 
-.input-group {
-    margin-bottom: 1.5rem;
-}
-
-.input-group label {
-    display: block;
-    font-size: 0.85rem;
-    color: var(--text-dim);
-    margin-bottom: 0.5rem;
-}
-
-input {
-    width: 100%;
-    padding: 12px;
-    background: var(--card-bg);
-    border: 1px solid #333;
-    border-radius: 8px;
-    color: white;
-    font-size: 1rem;
-}
-
-input:focus {
-    outline: none;
-    border-color: var(--accent-color);
-}
-
-.btn-primary {
-    width: 100%;
-    padding: 14px;
-    background-color: var(--accent-color);
-    color: black;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: transform 0.1s;
-}
-
-.btn-primary:active {
-    transform: scale(0.98);
-}
-
-.divider {
-    text-align: center;
-    margin: 1.5rem 0;
-    border-bottom: 1px solid #333;
-    line-height: 0.1em;
-}
-
-.divider span {
-    background: var(--bg-color);
-    padding: 0 10px;
-    color: var(--text-dim);
-    font-size: 0.8rem;
-}
-
-.btn-social {
-    width: 100%;
-    padding: 12px;
-    background: white;
-    color: #333;
-    border-radius: 8px;
-    border: none;
+/* PIN Display Dots */
+.pin-display {
     display: flex;
-    align-items: center;
     justify-content: center;
-    gap: 10px;
-    cursor: pointer;
-    font-weight: 500;
+    gap: 15px;
+    margin-bottom: 2rem;
 }
 
-.btn-social img { width: 18px; }
+.dot {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--accent-color);
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.dot.active {
+    background: var(--accent-color);
+}
+
+/* Keypad Grid for Phone Access */
+.keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    width: 100%;
+    max-width: 280px;
+}
+
+.key {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 18px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.1s;
+}
+
+.key:active {
+    background: var(--accent-color);
+    color: var(--text-dim);
+    transform: scale(0.95);
+}
+
+/* Special styling for Clear and Go keys */
+.key-clear { color: #ff6b6b; }
+.key-go { color: var(--accent-color); font-size: 1rem; }
 
 .footer-text {
     margin-top: 2rem;
-    text-align: center;
     font-size: 0.9rem;
-    color: var(--text-dim);
+    color: white;
 }
 
 .footer-text a {
     color: var(--accent-color);
     text-decoration: none;
+    font-weight: bold;
 }
