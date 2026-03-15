@@ -27,6 +27,10 @@ import com.team2.studentfitness.DatabaseCreation
 import com.team2.studentfitness.R
 import com.team2.studentfitness.database.SettingsDao
 import kotlinx.coroutines.launch
+import com.team2.studentfitness.ui.theme.Teal
+import com.team2.studentfitness.ui.theme.Mint
+import com.team2.studentfitness.ui.theme.Orange
+import com.team2.studentfitness.ui.theme.StudentFitnessTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,7 +39,7 @@ fun Dashboard(navController: NavController) {
     val scope = rememberCoroutineScope()
     val database = (context.applicationContext as DatabaseCreation).database
     val settingsDao = database.settingsDao()
-    
+
     var userName by remember { mutableStateOf("User") }
 
     LaunchedEffect(Unit) {
@@ -131,31 +135,31 @@ fun Dashboard(navController: NavController) {
             // METRIC CARDS
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    HealthMetricCard(title = "Heart Rate", value = "70 bpm", color = Mint, modifier = Modifier.weight(1f)) { 
-                        navController.navigate("detail/Heart Rate") 
+                    HealthMetricCard(title = "Heart Rate", value = "70 bpm", color = Mint, modifier = Modifier.weight(1f)) {
+                        navController.navigate("detail/Heart Rate")
                     }
-                    HealthMetricCard(title = "Calories Burned", value = "430 kcal", color = Orange, modifier = Modifier.weight(1f)) { 
-                        navController.navigate("detail/Calories") 
-                    }
-                }
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    HealthMetricCard(title = "Gym Hours", value = "8am-10pm", color = Teal, modifier = Modifier.weight(1f)) { 
-                        navController.navigate("detail/Gym Hours") 
-                    }
-                    HealthMetricCard(title = "Workout Timer", value = "30 min", color = Orange, modifier = Modifier.weight(1f)) { 
-                        navController.navigate("detail/Workout Timer") 
+                    HealthMetricCard(title = "Calories Burned", value = "430 kcal", color = Orange, modifier = Modifier.weight(1f)) {
+                        navController.navigate("detail/Calories")
                     }
                 }
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    HealthMetricCard(title = "Protein Intake", value = "80g / 120g", color = Orange, modifier = Modifier.weight(1f)) { 
-                        navController.navigate("detail/Protein Intake") 
+                    HealthMetricCard(title = "Gym Hours", value = "8am-10pm", color = Teal, modifier = Modifier.weight(1f)) {
+                        navController.navigate("detail/Gym Hours")
                     }
-                    HealthMetricCard(title = "Workout Tutorials", value = "Learn", color = Mint, modifier = Modifier.weight(1f)) { 
-                        navController.navigate("detail/Workout Tutorials") 
+                    HealthMetricCard(title = "Workout Timer", value = "30 min", color = Orange, modifier = Modifier.weight(1f)) {
+                        navController.navigate("detail/Workout Timer")
                     }
                 }
-                HealthMetricCard(title = "Mental Health", value = "Breathing", color = Teal, modifier = Modifier.fillMaxWidth()) { 
-                    navController.navigate("detail/Mental Health") 
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    HealthMetricCard(title = "Protein Intake", value = "80g / 120g", color = Orange, modifier = Modifier.weight(1f)) {
+                        navController.navigate("detail/Protein Intake")
+                    }
+                    HealthMetricCard(title = "Workout Tutorials", value = "Learn", color = Mint, modifier = Modifier.weight(1f)) {
+                        navController.navigate("detail/Workout Tutorials")
+                    }
+                }
+                HealthMetricCard(title = "Mental Health", value = "Breathing", color = Teal, modifier = Modifier.fillMaxWidth()) {
+                    navController.navigate("detail/Mental Health")
                 }
             }
         }

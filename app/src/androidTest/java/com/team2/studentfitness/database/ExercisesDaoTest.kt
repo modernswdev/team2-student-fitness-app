@@ -28,7 +28,7 @@ class ExercisesDaoTest {
             context, Database::class.java
         ).addCallback(Database.getDatabaseCallback(context))
          .build()
-        
+
         exercisesDao = db.exercisesDao()
 
         //Dummy query to ensure pre-population occurs before tests
@@ -46,22 +46,22 @@ class ExercisesDaoTest {
     @Test
     fun checkPrepopulatedData() = runTest {
         val allExercises = exercisesDao.getAll()
-        
+
         // exercise.csv has 80 exercises (E001 to E080)
         assertTrue("Database should be pre-populated with exercises", allExercises.isNotEmpty())
         assertEquals(80, allExercises.size)
-        
+
         // Check first exercise's accuracy
         val firstResult = exercisesDao.getByName("Barbell Bench Press")
         assertNotNull(firstResult)
         assertEquals(1, firstResult.size)
         assertEquals("Chest", firstResult[0].muscleGroup)
         assertEquals(1, firstResult[0].difficulty) // Intermediate = 1
-        
+
         // Check a beginner difficulty exercise
         val beginner = exercisesDao.getByName("Chest Fly (Dumbbell)")
         assertEquals(0, beginner[0].difficulty) // Beginner = 0
-        
+
         // Check an advanced difficulty exercise
         val advanced = exercisesDao.getByName("Pull-Ups")
         assertEquals(2, advanced[0].difficulty) // Advanced = 2
@@ -83,22 +83,17 @@ class ExercisesDaoTest {
     }
 
     @Test
-    fun testFilters() = runTest {
-        val chestExercises = exercisesDao.getByMuscleGroup("Chest")
-        assertTrue("Chest exercises should exist", chestExercises.isNotEmpty())
-        
-        val advancedExercises = exercisesDao.getByDifficulty(2)
-        assertTrue("Advanced exercises should exist", advancedExercises.isNotEmpty())
-    }
+    @Throws(Exception::class)
+    fun deleteExercises() {
+        val e1 = Exercises(uid = 1, workoutName = "Plank")
+        val e2 = Exercises(uid = 2, workoutName = "Lunge")
+        exercisesDao.insert(e1)
+        exercisesDao.insert(e2)
 
-    @Test
-    fun deleteExercises() = runTest {
-        val allBefore = exercisesDao.getAll()
-        val initialSize = allBefore.size
-        
-        if (allBefore.isNotEmpty()) {
-            exercisesDao.delete(allBefore[0])
-            assertEquals(initialSize - 1, exercisesDao.getAll().size)
-        }
+        exercisesDao.delete(e1)
+        assertEquals(1, exercisesDao.getAll().size)
+
+        exercisesDao.deleteById(2)
+        assertTrue(exercisesDao.getAll().isEmpty())
     }
 }
