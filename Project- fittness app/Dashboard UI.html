@@ -13,12 +13,12 @@
                 <p>Good Morning,</p>
                 <h1>Student</h1>
             </div>
-            <div class="profile-pic"></div>
+            <a href="Profile.html"><div class="profile-pic"></div></a>
         </header>
 
         <div class="tab-container">
-            <button class="tab-btn active" onclick="switchTab('workout')">Workout</button>
-            <button class="tab-btn" onclick="switchTab('mental')">Mental Health</button>
+            <button id="tab-w" class="tab-btn active" onclick="switchTab('workout')">Workout</button>
+            <button id="tab-m" class="tab-btn" onclick="switchTab('mental')">Mental Health</button>
         </div>
 
         <div id="workout-section">
@@ -35,14 +35,13 @@
                     </svg>
                 </div>
             </section>
-
             <h3>Video Tutorials</h3>
             <div class="video-grid">
-                <div class="video-card">
+                <div class="video-card" onclick="alert('Playing Squat Form...')">
                     <div class="video-thumb">▶</div>
                     <p>Squat Form</p>
                 </div>
-                <div class="video-card">
+                <div class="video-card" onclick="alert('Playing HIIT...')">
                     <div class="video-thumb">▶</div>
                     <p>HIIT Cardio</p>
                 </div>
@@ -52,47 +51,32 @@
         <div id="mental-section" style="display: none;">
             <div class="mood-tracker">
                 <p>How are you feeling?</p>
-                <div class="emojis">
-                    <span>😔</span><span>😐</span><span>🙂</span><span>🤩</span>
-                </div>
+                <div class="emojis"><span>😔</span><span>😐</span><span>🙂</span><span>🤩</span></div>
             </div>
-
-            <h3>Mindfulness & Stress</h3>
-            <div class="resource-list">
-                <a href="#" class="resource-item">
-                    <span class="icon">🧘</span>
-                    <div class="details">
-                        <strong>4-7-8 Breathing</strong>
-                        <span>Relieve anxiety now</span>
-                    </div>
-                </a>
-                <a href="https://www.mentalhealth.org.uk/" target="_blank" class="resource-item">
-                    <span class="icon">🔗</span>
-                    <div class="details">
-                        <strong>Stress Management</strong>
-                        <span>External Source</span>
-                    </div>
-                </a>
+            <div class="journal-container" style="background: var(--card-bg); padding: 15px; border-radius: 20px; margin-top: 20px;">
+                <h3>Daily Reflection</h3>
+                <textarea id="journal-input" style="width:100%; height:80px; margin: 10px 0; border-radius:10px; padding:10px; border:1px solid #ddd;" placeholder="What's on your mind?"></textarea>
+                <button onclick="saveEntry()" style="background: var(--mental-accent); color: white; border:none; padding:10px 20px; border-radius:10px; width:100%; font-weight:bold;">Save Note</button>
             </div>
         </div>
     </div>
 
     <script>
         function switchTab(tab) {
-            const workout = document.getElementById('workout-section');
-            const mental = document.getElementById('mental-section');
-            const buttons = document.querySelectorAll('.tab-btn');
+            document.getElementById('workout-section').style.display = tab === 'workout' ? 'block' : 'none';
+            document.getElementById('mental-section').style.display = tab === 'mental' ? 'block' : 'none';
+            document.getElementById('tab-w').classList.toggle('active', tab === 'workout');
+            document.getElementById('tab-m').classList.toggle('active', tab === 'mental');
+        }
 
-            buttons.forEach(btn => btn.classList.remove('active'));
-            
-            if(tab === 'workout') {
-                workout.style.display = 'block';
-                mental.style.display = 'none';
-                buttons[0].classList.add('active');
-            } else {
-                workout.style.display = 'none';
-                mental.style.display = 'block';
-                buttons[1].classList.add('active');
+        function saveEntry() {
+            const text = document.getElementById('journal-input').value.trim();
+            if (text) {
+                const entries = JSON.parse(localStorage.getItem('journalEntries')) || [];
+                entries.unshift({ date: new Date().toLocaleDateString(), content: text });
+                localStorage.setItem('journalEntries', JSON.stringify(entries));
+                document.getElementById('journal-input').value = "";
+                alert("Saved! Check your Profile to see it.");
             }
         }
     </script>
