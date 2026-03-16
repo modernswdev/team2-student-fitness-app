@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -34,8 +35,7 @@ class HealthDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun insertAndGetHealthData() {
+    fun insertAndGetHealthData() = runTest {
         val healthData = HealthData(
             id = 1,
             timestamp = "2023-10-27 10:00:00",
@@ -52,8 +52,7 @@ class HealthDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun getHeartRateAndBodyTemp() {
+    fun getHeartRateAndBodyTemp() = runTest {
         val timestamp = "2023-10-27 12:00:00"
         val healthData = HealthData(1, timestamp, 80, 36, 0, 0)
         healthDao.insert(healthData)
@@ -66,8 +65,7 @@ class HealthDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun stepCountOperations() {
+    fun stepCountOperations() = runTest {
         val healthData = HealthData(1, "2023-10-27 14:00:00", 70, 37, 1000, 500)
         healthDao.insert(healthData)
 
@@ -81,8 +79,7 @@ class HealthDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun totalStepsOperations() {
+    fun totalStepsOperations() = runTest {
         val healthData = HealthData(1, "2023-10-27 14:00:00", 70, 37, 1000, 500)
         healthDao.insert(healthData)
 
@@ -96,8 +93,7 @@ class HealthDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun deleteHealthData() {
+    fun deleteHealthData() = runTest {
         val healthData = HealthData(1, "2023-10-27 15:00:00", 75, 37, 0, 0)
         healthDao.insert(healthData)
         healthDao.deleteById(1)

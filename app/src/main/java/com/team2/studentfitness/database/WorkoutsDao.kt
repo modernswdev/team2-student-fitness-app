@@ -9,62 +9,62 @@ import androidx.room.Delete
 interface WorkoutsDao {
     //Put queries here
     @Query("SELECT * FROM Workouts")
-    fun getAll(): List<Workouts>
+    suspend fun getAll(): List<Workouts>
 
     @Query("SELECT * FROM Workouts WHERE uid = :uid")
-    fun getById(uid: Int): Workouts
+    suspend fun getById(uid: Int): Workouts
 
     @Query("SELECT * FROM Workouts WHERE name = :name")
-    fun getByName(name: String): List<Workouts>
+    suspend fun getByName(name: String): List<Workouts>
 
     @Insert()
-    fun insert(workouts: Workouts)
+    suspend fun insert(workouts: Workouts)
 
     @Delete()
-    fun delete(workouts: Workouts)
+    suspend fun delete(workouts: Workouts)
 
     @Query("DELETE FROM Workouts WHERE uid = :uid")
-    fun deleteById(uid: Int)
+    suspend fun deleteById(uid: Int)
 
     // ----- Select all -----
     //Select all by type
     @Query("SELECT * FROM Workouts WHERE type = :type")
-    fun getByType(type: Int): List<Workouts>
+    suspend fun getByType(type: Int): List<Workouts>
 
     //Select all by duration
     @Query("SELECT * FROM Workouts WHERE duration = :duration")
-    fun getByDuration(duration: Int): List<Workouts>
+    suspend fun getByDuration(duration: Int): List<Workouts>
 
     //Select all by focus
     @Query("SELECT * FROM Workouts WHERE focus = :focus")
-    fun getByFocus(focus: String): List<Workouts>
+    suspend fun getByFocus(focus: String): List<Workouts>
 
     //Select all by difficulty
     @Query("SELECT * FROM Workouts WHERE difficulty = :difficulty")
-    fun getByDifficulty(difficulty: Int): List<Workouts>
+    suspend fun getByDifficulty(difficulty: Int): List<Workouts>
 
     //Select all by split
     @Query("SELECT * FROM Workouts WHERE split = :split")
-    fun getBySplit(split: String): List<Workouts>
+    suspend fun getBySplit(split: String): List<Workouts>
 
     // ----- Select by ID -----
     //Get type by ID
     @Query("SELECT type FROM Workouts WHERE uid = :uid")
-    fun getType(uid: Int): Int
+    suspend fun getType(uid: Int): Int
 
     //Get duration by ID
     @Query("SELECT duration FROM Workouts WHERE uid = :uid")
-    fun getDuration(uid: Int): Int
+    suspend fun getDuration(uid: Int): Int
 
     //Get focus by ID
     @Query("SELECT focus FROM Workouts WHERE uid = :uid")
-    fun getFocus(uid: Int): String
+    suspend fun getFocus(uid: Int): String
 
     //Get difficulty by ID
     @Query("SELECT difficulty FROM Workouts WHERE uid = :uid")
-    fun getDifficulty(uid: Int): Int
+    suspend fun getDifficulty(uid: Int): Int
 
     //Get split by ID
     @Query("SELECT split FROM Workouts WHERE uid = :uid")
-    fun getSplit(uid: Int): String
+    suspend fun getSplit(uid: Int): String
 }

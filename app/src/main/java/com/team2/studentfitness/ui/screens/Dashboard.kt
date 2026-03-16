@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,7 +23,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.team2.studentfitness.DatabaseCreation
 import com.team2.studentfitness.R
+import com.team2.studentfitness.database.SettingsDao
+import kotlinx.coroutines.launch
 import com.team2.studentfitness.ui.theme.Teal
 import com.team2.studentfitness.ui.theme.Mint
 import com.team2.studentfitness.ui.theme.Orange
@@ -31,6 +35,23 @@ import com.team2.studentfitness.ui.theme.StudentFitnessTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Dashboard(navController: NavController) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val database = (context.applicationContext as DatabaseCreation).database
+    val settingsDao = database.settingsDao()
+
+    var userName by remember { mutableStateOf("User") }
+
+    LaunchedEffect(Unit) {
+        // Using uid 1000 from the pre-populated dummyusersettings.csv
+        // For actual integration, should pull uid of currently logged-in user
+        try {
+            userName = settingsDao.getName(1000)
+        } catch (e: Exception) {
+            // Fallback if not found
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -46,7 +67,7 @@ fun Dashboard(navController: NavController) {
                         )
                         Column(modifier = Modifier.padding(start = 12.dp)) {
                             Text(
-                                text = "Hey, Michelle",
+                                text = "Hey, $userName",
                                 style = MaterialTheme.typography.titleMedium,
                                 color = Color.White
                             )

@@ -10,7 +10,7 @@ data class Exercises (
     @PrimaryKey(autoGenerate = true)
     val uid: Int,
     @ColumnInfo(name = "name")
-    val workoutName: String,
+    val name: String,
     @ColumnInfo(name = "muscleGroup")
     val muscleGroup: String,
     @ColumnInfo(name = "difficulty")

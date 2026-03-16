@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -34,8 +35,7 @@ class SettingsDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun insertAndGetSettings() {
+    fun insertAndGetSettings() = runTest {
         val settings = UserSettings(
             uid = 1,
             name = "John Doe",
@@ -54,8 +54,7 @@ class SettingsDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun updateTheme() {
+    fun updateTheme() = runTest {
         val settings = UserSettings(1, "User", true, 1, 101, 0)
         settingsDao.insert(settings)
         
@@ -65,8 +64,7 @@ class SettingsDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun updateNotifs() {
+    fun updateNotifs() = runTest {
         val settings = UserSettings(1, "User", true, 1, 101, 0)
         settingsDao.insert(settings)
         
@@ -76,8 +74,7 @@ class SettingsDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun incrementLoginCount() {
+    fun incrementLoginCount() = runTest {
         val settings = UserSettings(1, "User", true, 1, 101, 10)
         settingsDao.insert(settings)
         
@@ -87,8 +84,7 @@ class SettingsDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun deleteSettings() {
+    fun deleteSettings() = runTest {
         val settings = UserSettings(1, "User", true, 1, 101, 0)
         settingsDao.insert(settings)
         settingsDao.delete(settings)

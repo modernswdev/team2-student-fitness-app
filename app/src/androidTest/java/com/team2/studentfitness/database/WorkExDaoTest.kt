@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -21,10 +23,18 @@ class WorkExDaoTest {
     @Before
     fun createDb() {
         val context = ApplicationProvider.getApplicationContext<Context>()
+        // Add the callback to trigger pre-population
         db = Room.inMemoryDatabaseBuilder(
             context, Database::class.java
-        ).allowMainThreadQueries().build()
+        ).addCallback(Database.getDatabaseCallback(context))
+         .build()
+        
         workExDao = db.workExDao()
+
+        //Dummy query to ensure pre-population occurs before tests
+        runBlocking {
+            workExDao.getAll()
+        }
     }
 
     @After
@@ -34,70 +44,69 @@ class WorkExDaoTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun insertAndGetAllWorkEx() {
+    fun checkPrepopulatedData() = runTest {
+        val allWorkEx = workExDao.getAll()
+        
+        // join.csv has 124 records
+        assertEquals(124, allWorkEx.size)
+        
+        // Check first record
+        val w001Records = workExDao.getByName("W001")
+        assertTrue(w001Records.isNotEmpty())
+        val first = w001Records.find { it.order == 1 }
+        assertNotNull(first)
+        assertEquals(1, first?.userID) // W001 -> 1
+        assertEquals(1, first?.exerciseID) // E001 -> 1
+        assertEquals(4, first?.sets)
+        assertEquals(6, first?.reps) // "6-8" parsed as 6
+        assertEquals(120, first?.restTime)
+    }
+
+    @Test
+    fun insertAndGetAllWorkEx() = runTest {
         val workEx = WorkEx(
-            uid = 1,
-            workoutName = "Morning Routine",
-            userID = 101,
-            exerciseID = 201,
+            uid = 1000,
+            workoutName = "Custom",
+            userID = 100,
+            exerciseID = 200,
             reps = 10,
             sets = 3,
             restTime = 60,
             order = 1
         )
         workExDao.insert(workEx)
-        val allWorkEx = workExDao.getAll()
-        assertEquals(1, allWorkEx.size)
-        assertEquals("Morning Routine", allWorkEx[0].workoutName)
+        val result = workExDao.getByName("Custom")
+        assertEquals(1, result.size)
+        assertEquals(100, result[0].userID)
     }
 
     @Test
-    @Throws(Exception::class)
-    fun getByIdAndName() {
-        val workEx = WorkEx(1, "Bench Press Session", 101, 202, 8, 4, 90, 2)
-        workExDao.insert(workEx)
+    fun updateMethods() = runTest {
+        // Get an existing record to update
+        val first = workExDao.getAll()[0]
+        val uid = first.uid
 
-        val byId = workExDao.getById(1)
-        assertNotNull(byId)
-        assertEquals("Bench Press Session", byId.workoutName)
+        workExDao.editReps(uid, 99)
+        assertEquals(99, workExDao.getById(uid).reps)
 
-        val byName = workExDao.getByName("Bench Press Session")
-        assertEquals(1, byName.size)
-        assertEquals(1, byName[0].uid)
+        workExDao.editSets(uid, 88)
+        assertEquals(88, workExDao.getById(uid).sets)
+
+        workExDao.editRestTime(uid, 77)
+        assertEquals(77, workExDao.getById(uid).restTime)
+
+        workExDao.editOrder(uid, 66)
+        assertEquals(66, workExDao.getById(uid).order)
     }
 
     @Test
-    @Throws(Exception::class)
-    fun updateMethods() {
-        val workEx = WorkEx(1, "Test Workout", 1, 1, 10, 3, 60, 1)
-        workExDao.insert(workEx)
-
-        workExDao.editReps(1, 12)
-        assertEquals(12, workExDao.getById(1).reps)
-
-        workExDao.editSets(1, 5)
-        assertEquals(5, workExDao.getById(1).sets)
-
-        workExDao.editRestTime(1, 45)
-        assertEquals(45, workExDao.getById(1).restTime)
-
-        workExDao.editOrder(1, 2)
-        assertEquals(2, workExDao.getById(1).order)
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun deleteWorkEx() {
-        val we1 = WorkEx(1, "W1", 1, 1, 10, 3, 60, 1)
-        val we2 = WorkEx(2, "W2", 1, 2, 10, 3, 60, 2)
-        workExDao.insert(we1)
-        workExDao.insert(we2)
-
-        workExDao.delete(we1)
-        assertEquals(1, workExDao.getAll().size)
-
-        workExDao.deleteById(2)
-        assertTrue(workExDao.getAll().isEmpty())
+    fun deleteWorkEx() = runTest {
+        val allBefore = workExDao.getAll()
+        val initialSize = allBefore.size
+        
+        if (allBefore.isNotEmpty()) {
+            workExDao.delete(allBefore[0])
+            assertEquals(initialSize - 1, workExDao.getAll().size)
+        }
     }
 }

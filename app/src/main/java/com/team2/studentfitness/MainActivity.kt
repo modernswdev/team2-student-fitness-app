@@ -13,6 +13,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -27,22 +28,30 @@ import com.team2.studentfitness.ui.screens.Dashboard
 import com.team2.studentfitness.ui.screens.LoginScreen
 import com.team2.studentfitness.ui.screens.SettingsScreen
 import com.team2.studentfitness.ui.theme.StudentFitnessTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import com.team2.studentfitness.viewmodels.LoginViewModel
 import com.team2.studentfitness.viewmodels.SecurePinManager
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Initialize database
+        lifecycleScope.launch(Dispatchers.IO) {
+            (application as DatabaseCreation).database
+        }
+
         enableEdgeToEdge()
         setContent {
             StudentFitnessTheme {
                 val navController = rememberNavController()
                 val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route
                 val context = LocalContext.current
-                
+
                 // For now, initializing manually. In a real app, use Hilt or Koin.
-                val loginViewModel = remember { 
-                    LoginViewModel(SecurePinManager(context)) 
+                val loginViewModel = remember {
+                    LoginViewModel(SecurePinManager(context))
                 }
 
                 Scaffold(
@@ -63,7 +72,7 @@ class MainActivity : ComponentActivity() {
                         composable(AppRoutes.Login) {
                             LoginScreen(
                                 viewModel = loginViewModel,
-                                onLoginSuccess = { 
+                                onLoginSuccess = {
                                     navController.navigate(AppRoutes.Dashboard) {
                                         popUpTo(AppRoutes.Login) { inclusive = true }
                                     }
@@ -79,7 +88,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(AppRoutes.Settings) {
                             SettingsScreen(
-                                onLogout = { 
+                                onLogout = {
                                     navController.navigate(AppRoutes.Login) {
                                         popUpTo(AppRoutes.Dashboard) { inclusive = true }
                                     }
