@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Scholar Strong</title>
+    <link rel="stylesheet" href="Dashboard Style.css">
+    <style>
+        .history-item { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid var(--accent); }
+        .history-item small { color: var(--bg-color); font-weight: bold; display: block; }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <header>
+            <button onclick="window.history.back()" style="background:none; border:none; font-size:1.5rem; color:white; cursor:pointer;">←</button>
+            <h1 style="color:white;">Profile</h1>
+            <div style="width:45px;"></div>
+        </header>
+
+        <div style="text-align: center; color: white; margin-bottom: 30px;">
+            <div class="profile-pic" style="width:80px; height:80px; margin: 0 auto 10px;"></div>
+            <h2>Scholar Student</h2>
+        </div>
+
+        <div id="history-list">
+            <h3 style="color:white; margin-bottom:15px;">My Reflections</h3>
+            </div>
+
+        <button onclick="localStorage.removeItem('journalEntries'); location.reload();" style="margin-top:20px; background:none; border:1px solid white; color:white; padding:10px; border-radius:10px; width:100%;">Clear All Entries</button>
+    </div>
+
+    <script>
+        const list = document.getElementById('history-list');
+        const entries = JSON.parse(localStorage.getItem('journalEntries')) || [];
+        if(entries.length === 0) {
+            list.innerHTML += "<p style='color:white; opacity:0.7;'>No reflections saved yet.</p>";
+        } else {
+            list.innerHTML += entries.map(e => `
+                <div class="history-item">
+                    <small>${e.date}</small>
+                    <p>${e.content}</p>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
