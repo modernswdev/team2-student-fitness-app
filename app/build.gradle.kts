@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android) // Updated code 
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
 }
@@ -28,11 +29,22 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        // Updated to Java 17 for stability with SDK 36 and GitHub Actions
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
     buildFeatures {
         compose = true
+    }
+
+    composeOptions {
+        // Corrected Kotlin DSL syntax for the compiler version
+        kotlinCompilerExtensionVersion = "1.5.0" 
     }
 }
 
@@ -44,7 +56,7 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material3) // Note: My code used Material (2), ensure you use Material3 components
     implementation(libs.androidx.security.crypto)
     implementation(libs.core.ktx)
     implementation(libs.androidx.navigation.compose)
