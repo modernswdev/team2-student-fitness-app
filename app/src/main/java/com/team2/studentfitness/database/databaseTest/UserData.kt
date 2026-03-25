@@ -11,8 +11,6 @@ data class User (
     val uid: Int,
     @ColumnInfo(name = "name")
     val name: String,
-    @ColumnInfo(name = "password")
-    val password: String,
     @ColumnInfo(name = "loginCount")
     val loginCount: Int
 )

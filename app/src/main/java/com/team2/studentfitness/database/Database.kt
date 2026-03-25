@@ -8,7 +8,7 @@ import com.team2.studentfitness.R
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
-@androidx.room.Database(entities = [UserSettings::class, WorkEx::class, Exercises::class, HealthData::class, Workouts::class], version = 1)
+@androidx.room.Database(entities = [UserSettings::class, WorkEx::class, Exercises::class, HealthData::class, Workouts::class], version = 3)
 public abstract class Database : RoomDatabase() {
     abstract fun settingsDao(): SettingsDao
     abstract fun workoutsDao(): WorkoutsDao
@@ -28,6 +28,7 @@ public abstract class Database : RoomDatabase() {
                     "student_fitness_database"
                 )
                 .addCallback(getDatabaseCallback(context))
+                .fallbackToDestructiveMigration()
                 .build()
                 INSTANCE = instance
                 instance
@@ -41,7 +42,6 @@ public abstract class Database : RoomDatabase() {
                     prepopulateExercises(context, db)
                     prepopulateWorkouts(context, db)
                     prepopulateWorkEx(context, db)
-                    prepopulateDummyUserSettings(context, db)   //For testing purposes only
                 }
             }
         }
@@ -154,45 +154,6 @@ public abstract class Database : RoomDatabase() {
                             db.execSQL(
                                 "INSERT INTO WorkEx (workoutName, workoutID, exerciseID, reps, sets, restTime, exOrder) VALUES (?, ?, ?, ?, ?, ?, ?)",
                                 arrayOf<Any>(workoutIDStr, workoutID, exerciseID, reps, sets, rest, order)
-                            )
-                        }
-                        line = r.readLine()
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-
-        //For testing purposes only - remove before release
-        //Prepopulates a dummy UserSettings from dummyusersettings.csv
-
-        private fun prepopulateDummyUserSettings(context: Context, db: SupportSQLiteDatabase) {
-            try {
-                val inputStream = context.resources.openRawResource(R.raw.dummyusersettings)
-                val reader = BufferedReader(InputStreamReader(inputStream))
-                reader.use { r ->
-                    r.readLine() // Skip header
-                    var line: String? = r.readLine()
-                    while (line != null) {
-                        val parts = line.split(",")
-                        if (parts.size >= 6) {
-                            val uid = clean(parts[0]).toIntOrNull() ?: 0
-                            val name = clean(parts[1])
-                            val notifsOn = clean(parts[2]).lowercase() == "true"
-                            val theme = clean(parts[3]).toIntOrNull() ?: 1
-                            val homeGymStr = clean(parts[4])
-                            val loginCount = clean(parts[5]).toIntOrNull() ?: 0
-
-                            // Map known gym names to IDs if necessary, otherwise default to 0
-                            val homeGym = when (homeGymStr.uppercase()) {
-                                "UALR" -> 1
-                                else -> homeGymStr.toIntOrNull() ?: 0
-                            }
-
-                            db.execSQL(
-                                "INSERT INTO UserSettings (uid, name, notifsOn, theme, homeGym, loginCount) VALUES (?, ?, ?, ?, ?, ?)",
-                                arrayOf<Any>(uid, name, if (notifsOn) 1 else 0, theme, homeGym, loginCount)
                             )
                         }
                         line = r.readLine()

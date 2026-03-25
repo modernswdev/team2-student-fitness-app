@@ -20,26 +20,28 @@ class OnboardingViewModel(application: Application, private val securePinManager
 
     fun completeOnboarding(
         name: String,
-        password: String,
-        heartRate: Int,
-        bodyTemp: Int,
-        totalSteps: Int,
+        age: Int,
+        weight: Float,
+        height: Float,
         pin: Int?,
         onComplete: () -> Unit
     ) {
         viewModelScope.launch {
-            // 1. Store Account Data
-            val user = User(uid = 0, name = name, password = password, loginCount = 1)
+            // 1. Store Account Data (No password as requested)
+            val user = User(uid = 0, name = name, loginCount = 1)
             userDatabase.userDao().insert(user)
             val insertedUser = userDatabase.userDao().findByName(name)
             val uid = insertedUser?.uid ?: 0
 
-            // 2. Store Health/Biometric Data
+            // 2. Store Health/Biometric Data (Age, Weight, Height)
             val healthData = HealthData(
-                heartRate = heartRate,
-                bodyTemp = bodyTemp,
-                totalSteps = totalSteps,
-                stepCount = 0
+                heartRate = 0,
+                bodyTemp = 0,
+                totalSteps = 0,
+                stepCount = 0,
+                age = age,
+                weight = weight,
+                height = height
             )
             appDatabase.healthDao().insert(healthData)
 

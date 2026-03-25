@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
                 val onboardingViewModel = remember { OnboardingViewModel(application, securePinManager) }
 
                 val startDestination = if (onboardingViewModel.isOnboardingCompleted()) {
-                    AppRoutes.Login
+                    if (securePinManager.isPinSet()) AppRoutes.Login else AppRoutes.Dashboard
                 } else {
                     AppRoutes.Onboarding
                 }
@@ -81,7 +81,8 @@ class MainActivity : ComponentActivity() {
                             OnboardingScreen(
                                 viewModel = onboardingViewModel,
                                 onOnboardingComplete = {
-                                    navController.navigate(AppRoutes.Dashboard) {
+                                    val nextDest = if (securePinManager.isPinSet()) AppRoutes.Login else AppRoutes.Dashboard
+                                    navController.navigate(nextDest) {
                                         popUpTo(AppRoutes.Onboarding) { inclusive = true }
                                     }
                                 }
@@ -107,7 +108,8 @@ class MainActivity : ComponentActivity() {
                         composable(AppRoutes.Settings) {
                             SettingsScreen(
                                 onLogout = {
-                                    navController.navigate(AppRoutes.Login) {
+                                    val nextDest = if (securePinManager.isPinSet()) AppRoutes.Login else AppRoutes.Dashboard
+                                    navController.navigate(nextDest) {
                                         popUpTo(AppRoutes.Dashboard) { inclusive = true }
                                     }
                                 }
