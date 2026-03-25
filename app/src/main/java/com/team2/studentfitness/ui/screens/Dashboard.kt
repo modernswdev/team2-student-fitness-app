@@ -25,7 +25,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.team2.studentfitness.DatabaseCreation
 import com.team2.studentfitness.R
-import com.team2.studentfitness.database.SettingsDao
 import kotlinx.coroutines.launch
 import com.team2.studentfitness.ui.theme.Teal
 import com.team2.studentfitness.ui.theme.Mint
@@ -39,14 +38,23 @@ fun Dashboard(navController: NavController) {
     val scope = rememberCoroutineScope()
     val database = (context.applicationContext as DatabaseCreation).database
     val settingsDao = database.settingsDao()
+    val healthDao = database.healthDao()
 
     var userName by remember { mutableStateOf("User") }
+    var userWeight by remember { mutableStateOf("0.0") }
 
     LaunchedEffect(Unit) {
-        // Using uid 1000 from the pre-populated dummyusersettings.csv
-        // For actual integration, should pull uid of currently logged-in user
         try {
-            userName = settingsDao.getName(1000)
+            // Fetch the latest user settings and health data
+            val latestSettings = settingsDao.getLatest()
+            if (latestSettings != null) {
+                userName = latestSettings.name
+            }
+            
+            val latestHealth = healthDao.getLatest()
+            if (latestHealth != null) {
+                userWeight = latestHealth.weight.toString()
+            }
         } catch (e: Exception) {
             // Fallback if not found
         }
@@ -135,31 +143,36 @@ fun Dashboard(navController: NavController) {
             // METRIC CARDS
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    HealthMetricCard(title = "Current Weight", value = "$userWeight kg", color = Teal, modifier = Modifier.weight(1f)) {
+                        navController.navigate("detail/Weight")
+                    }
                     HealthMetricCard(title = "Heart Rate", value = "70 bpm", color = Mint, modifier = Modifier.weight(1f)) {
                         navController.navigate("detail/Heart Rate")
                     }
+                }
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     HealthMetricCard(title = "Calories Burned", value = "430 kcal", color = Orange, modifier = Modifier.weight(1f)) {
                         navController.navigate("detail/Calories")
                     }
-                }
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     HealthMetricCard(title = "Gym Hours", value = "8am-10pm", color = Teal, modifier = Modifier.weight(1f)) {
                         navController.navigate("detail/Gym Hours")
                     }
+                }
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     HealthMetricCard(title = "Workout Timer", value = "30 min", color = Orange, modifier = Modifier.weight(1f)) {
                         navController.navigate("detail/Workout Timer")
                     }
-                }
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     HealthMetricCard(title = "Protein Intake", value = "80g / 120g", color = Orange, modifier = Modifier.weight(1f)) {
                         navController.navigate("detail/Protein Intake")
                     }
+                }
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     HealthMetricCard(title = "Workout Tutorials", value = "Learn", color = Mint, modifier = Modifier.weight(1f)) {
                         navController.navigate("detail/Workout Tutorials")
                     }
-                }
-                HealthMetricCard(title = "Mental Health", value = "Breathing", color = Teal, modifier = Modifier.fillMaxWidth()) {
-                    navController.navigate("detail/Mental Health")
+                    HealthMetricCard(title = "Mental Health", value = "Breathing", color = Teal, modifier = Modifier.weight(1f)) {
+                        navController.navigate("detail/Mental Health")
+                    }
                 }
             }
         }

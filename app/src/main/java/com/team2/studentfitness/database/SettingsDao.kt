@@ -13,6 +13,9 @@ interface SettingsDao {
     @Query("SELECT * FROM usersettings WHERE uid = :uid")
     suspend fun getById(uid: Int): UserSettings
 
+    @Query("SELECT * FROM usersettings ORDER BY uid DESC LIMIT 1")
+    suspend fun getLatest(): UserSettings?
+
     @Insert()
     suspend fun insert(userSettings: UserSettings)
 

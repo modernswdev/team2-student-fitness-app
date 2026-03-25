@@ -13,6 +13,9 @@ interface HealthDao {
     @Query("SELECT * FROM healthdata WHERE id = :id")
     suspend fun getById(id: Int): HealthData
 
+    @Query("SELECT * FROM healthdata ORDER BY id DESC LIMIT 1")
+    suspend fun getLatest(): HealthData?
+
     @Query("SELECT * FROM healthdata WHERE timestamp = :timestamp")
     suspend fun getByTimestamp(timestamp: String): List<HealthData>
 

@@ -18,5 +18,11 @@ data class HealthData (
     @ColumnInfo(name = "totalSteps")
     val totalSteps: Int,
     @ColumnInfo(name = "stepCount")
-    val stepCount: Int
+    val stepCount: Int,
+    @ColumnInfo(name = "age")
+    val age: Int = 0,
+    @ColumnInfo(name = "weight")
+    val weight: Float = 0f,
+    @ColumnInfo(name = "height")
+    val height: Float = 0f
 )

@@ -47,7 +47,7 @@ class UserDatabaseTest {
     @Throws(Exception::class)
     fun writeUserAndReadInList() {
         // Use uid = 0 to allow Room to auto-generate the ID
-        val user = User(uid = 0, name = "TestUser", password = "password123", loginCount = 0)
+        val user = User(uid = 0, name = "TestUser", loginCount = 0)
         userDao.insert(user)
         val byName = userDao.findByName("TestUser")
         assertNotNull("User should be found by name", byName)
@@ -57,7 +57,7 @@ class UserDatabaseTest {
     @Test
     @Throws(Exception::class)
     fun incrementLoginCount() {
-        val user = User(uid = 1, name = "TestUser", password = "password123", loginCount = 0)
+        val user = User(uid = 1, name = "TestUser", loginCount = 0)
         userDao.insert(user)
         userDao.incrementLoginCount(1)
         val updatedUser = userDao.getUserById(1)
@@ -68,7 +68,7 @@ class UserDatabaseTest {
     @Test
     @Throws(Exception::class)
     fun deleteUser() {
-        val user = User(uid = 1, name = "TestUser", password = "password123", loginCount = 0)
+        val user = User(uid = 1, name = "TestUser", loginCount = 0)
         userDao.insert(user)
         userDao.delete(user)
         val allUsers = userDao.getAll()
