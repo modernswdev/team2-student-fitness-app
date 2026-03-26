@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,7 +20,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.team2.studentfitness.DatabaseCreation
@@ -30,6 +29,7 @@ import com.team2.studentfitness.ui.theme.Teal
 import com.team2.studentfitness.ui.theme.Mint
 import com.team2.studentfitness.ui.theme.Orange
 import com.team2.studentfitness.ui.theme.StudentFitnessTheme
+import com.team2.studentfitness.ui.navigation.AppRoutes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,18 +45,17 @@ fun Dashboard(navController: NavController) {
 
     LaunchedEffect(Unit) {
         try {
-            // Fetch the latest user settings and health data
             val latestSettings = settingsDao.getLatest()
             if (latestSettings != null) {
                 userName = latestSettings.name
             }
-            
+
             val latestHealth = healthDao.getLatest()
             if (latestHealth != null) {
                 userWeight = latestHealth.weight.toString()
             }
         } catch (e: Exception) {
-            // Fallback if not found
+            // fallback safe
         }
     }
 
@@ -73,6 +72,7 @@ fun Dashboard(navController: NavController) {
                                 .clip(CircleShape)
                                 .background(MaterialTheme.colorScheme.secondaryContainer)
                         )
+
                         Column(modifier = Modifier.padding(start = 12.dp)) {
                             Text(
                                 text = "Hey, $userName",
@@ -87,38 +87,55 @@ fun Dashboard(navController: NavController) {
                         }
                     }
                 },
+
+                // Settings Button
                 actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(
+                        onClick = { navController.navigate(AppRoutes.Settings) }
+                    ) {
                         Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "More Options",
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Open Settings",
                             tint = Color.White
                         )
                     }
                 },
+
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Teal,
                     titleContentColor = Color.White
                 )
             )
         },
+
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
+
         Column(
             modifier = Modifier
                 .padding(padding)
                 .padding(horizontal = 16.dp)
                 .fillMaxSize()
         ) {
+
             var searchQuery by remember { mutableStateOf("") }
-            
+
             Spacer(modifier = Modifier.height(16.dp))
 
+            // SEARCH BAR
             TextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("Search metrics...", color = Color.Gray) },
-                leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = "Search", tint = Teal) },
+                placeholder = {
+                    Text("Search metrics...", color = Color.Gray)
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search",
+                        tint = Teal
+                    )
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -142,35 +159,95 @@ fun Dashboard(navController: NavController) {
 
             // METRIC CARDS
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    HealthMetricCard(title = "Current Weight", value = "$userWeight kg", color = Teal, modifier = Modifier.weight(1f)) {
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    HealthMetricCard(
+                        title = "Current Weight",
+                        value = "$userWeight kg",
+                        color = Teal,
+                        modifier = Modifier.weight(1f)
+                    ) {
                         navController.navigate("detail/Weight")
                     }
-                    HealthMetricCard(title = "Heart Rate", value = "70 bpm", color = Mint, modifier = Modifier.weight(1f)) {
+
+                    HealthMetricCard(
+                        title = "Heart Rate",
+                        value = "70 bpm",
+                        color = Mint,
+                        modifier = Modifier.weight(1f)
+                    ) {
                         navController.navigate("detail/Heart Rate")
                     }
                 }
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    HealthMetricCard(title = "Calories Burned", value = "430 kcal", color = Orange, modifier = Modifier.weight(1f)) {
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    HealthMetricCard(
+                        title = "Calories Burned",
+                        value = "430 kcal",
+                        color = Orange,
+                        modifier = Modifier.weight(1f)
+                    ) {
                         navController.navigate("detail/Calories")
                     }
-                    HealthMetricCard(title = "Gym Hours", value = "8am-10pm", color = Teal, modifier = Modifier.weight(1f)) {
+
+                    HealthMetricCard(
+                        title = "Gym Hours",
+                        value = "8am-10pm",
+                        color = Teal,
+                        modifier = Modifier.weight(1f)
+                    ) {
                         navController.navigate("detail/Gym Hours")
                     }
                 }
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    HealthMetricCard(title = "Workout Timer", value = "30 min", color = Orange, modifier = Modifier.weight(1f)) {
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    HealthMetricCard(
+                        title = "Workout Timer",
+                        value = "30 min",
+                        color = Orange,
+                        modifier = Modifier.weight(1f)
+                    ) {
                         navController.navigate("detail/Workout Timer")
                     }
-                    HealthMetricCard(title = "Protein Intake", value = "80g / 120g", color = Orange, modifier = Modifier.weight(1f)) {
+
+                    HealthMetricCard(
+                        title = "Protein Intake",
+                        value = "80g / 120g",
+                        color = Orange,
+                        modifier = Modifier.weight(1f)
+                    ) {
                         navController.navigate("detail/Protein Intake")
                     }
                 }
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    HealthMetricCard(title = "Workout Tutorials", value = "Learn", color = Mint, modifier = Modifier.weight(1f)) {
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    HealthMetricCard(
+                        title = "Workout Tutorials",
+                        value = "Learn",
+                        color = Mint,
+                        modifier = Modifier.weight(1f)
+                    ) {
                         navController.navigate("detail/Workout Tutorials")
                     }
-                    HealthMetricCard(title = "Mental Health", value = "Breathing", color = Teal, modifier = Modifier.weight(1f)) {
+
+                    HealthMetricCard(
+                        title = "Mental Health",
+                        value = "Breathing",
+                        color = Teal,
+                        modifier = Modifier.weight(1f)
+                    ) {
                         navController.navigate("detail/Mental Health")
                     }
                 }
@@ -180,26 +257,33 @@ fun Dashboard(navController: NavController) {
 }
 
 @Composable
-fun HealthMetricCard(title: String, value: String, color: Color, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun HealthMetricCard(
+    title: String,
+    value: String,
+    color: Color,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
     Card(
-        modifier = modifier
-            .clickable(onClick = onClick),
+        modifier = modifier.clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = title, 
-                style = MaterialTheme.typography.titleSmall, 
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
                 color = Color.Gray,
                 fontWeight = FontWeight.Medium
             )
+
             Spacer(modifier = Modifier.height(8.dp))
+
             Text(
-                text = value, 
-                style = MaterialTheme.typography.titleLarge, 
-                color = color, 
+                text = value,
+                style = MaterialTheme.typography.titleLarge,
+                color = color,
                 fontWeight = FontWeight.Bold
             )
         }
