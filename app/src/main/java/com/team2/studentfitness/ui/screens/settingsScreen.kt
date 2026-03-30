@@ -3,36 +3,25 @@ package com.team2.studentfitness.ui.screens
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.team2.studentfitness.ui.theme.NeonTeal
-import com.team2.studentfitness.ui.theme.NeonOrange
-import com.team2.studentfitness.ui.theme.CardBg
-import com.team2.studentfitness.ui.theme.TextDim
+import com.team2.studentfitness.ui.theme.Teal
+import com.team2.studentfitness.ui.theme.Orange
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
-    // Optional callbacks if your team later wires backend/navigation
     onLogout: () -> Unit = {},
 ) {
-    // ---- UI-only state (frontend) ----
     val gyms = remember {
         listOf("UALR Fitness Center", "Planet Fitness", "LA Fitness", "Anytime Fitness", "Other")
     }
@@ -46,10 +35,12 @@ fun SettingsScreen(
     var useMetric by remember { mutableStateOf(false) } // false = imperial
     var weeklyGoal by remember { mutableStateOf(3f) } // 0..7
 
+    val cardBg = Color(0xFFFAF3F3)
+
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(NeonTeal)
+            .background(Teal)
     ) {
         Column(
             modifier = Modifier
@@ -63,21 +54,21 @@ fun SettingsScreen(
                 fontSize = 34.sp,
                 fontWeight = FontWeight.Bold,
                 fontStyle = FontStyle.Italic,
-                color = NeonOrange,
+                color = Orange,
                 letterSpacing = (-1).sp
             )
             Text(
                 text = "Make the app fit your routine.",
-                color = Color.White,
+                color = Color.Black.copy(alpha = 0.8f),
                 fontSize = 14.sp,
                 modifier = Modifier.padding(top = 6.dp, bottom = 20.dp)
             )
 
             Spacer(Modifier.height(16.dp))
             //  Gym Settings
-            SettingsSection(title = "Gym") {
+            SettingsSection(title = "Gym", cardBg = cardBg) {
                 // Home Gym Dropdown
-                Text("Home gym", color = TextDim, fontSize = 13.sp)
+                Text("Home gym", color = Color.Gray, fontSize = 13.sp)
                 Spacer(Modifier.height(8.dp))
 
                 ExposedDropdownMenuBox(
@@ -92,9 +83,9 @@ fun SettingsScreen(
                             .menuAnchor()
                             .fillMaxWidth(),
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = CardBg,
-                            unfocusedContainerColor = CardBg,
-                            focusedIndicatorColor = NeonOrange,
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            focusedIndicatorColor = Orange,
                             unfocusedIndicatorColor = Color.Transparent,
                             focusedTextColor = Color.Black,
                             unfocusedTextColor = Color.Black
@@ -125,26 +116,27 @@ fun SettingsScreen(
                     label = "Gym reminders",
                     description = "Get nudges to stay consistent.",
                     checked = remindersEnabled,
-                    onCheckedChange = { remindersEnabled = it }
+                    onCheckedChange = { remindersEnabled = it },
+                    orange = Orange
                 )
             }
 
             Spacer(Modifier.height(16.dp))
 
             // ---- Workout Section ----
-            SettingsSection(title = "Workout") {
-                Text("Units", color = TextDim, fontSize = 13.sp)
+            SettingsSection(title = "Workout", cardBg = cardBg) {
+                Text("Units", color = Color.Gray, fontSize = 13.sp)
                 Spacer(Modifier.height(8.dp))
 
-                // Simple 2-option segmented style using FilterChips
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     FilterChip(
                         selected = !useMetric,
                         onClick = { useMetric = false },
                         label = { Text("Imperial") },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = NeonOrange,
-                            containerColor = CardBg
+                            selectedContainerColor = Orange,
+                            containerColor = Color.White,
+                            selectedLabelColor = Color.White
                         )
                     )
                     FilterChip(
@@ -152,20 +144,21 @@ fun SettingsScreen(
                         onClick = { useMetric = true },
                         label = { Text("Metric") },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = NeonOrange,
-                            containerColor = CardBg
+                            selectedContainerColor = Orange,
+                            containerColor = Color.White,
+                            selectedLabelColor = Color.White
                         )
                     )
                 }
 
                 Spacer(Modifier.height(18.dp))
 
-                Text("Weekly goal", color = TextDim, fontSize = 13.sp)
+                Text("Weekly goal", color = Color.Gray, fontSize = 13.sp)
                 Spacer(Modifier.height(6.dp))
 
                 Text(
                     text = "${weeklyGoal.toInt()} days/week",
-                    color = Color.White,
+                    color = Color.Black,
                     fontWeight = FontWeight.SemiBold
                 )
 
@@ -175,9 +168,9 @@ fun SettingsScreen(
                     valueRange = 0f..7f,
                     steps = 6, // gives integer stops
                     colors = SliderDefaults.colors(
-                        thumbColor = NeonOrange,
-                        activeTrackColor = NeonOrange,
-                        inactiveTrackColor = Color.White.copy(alpha = 0.35f)
+                        thumbColor = Orange,
+                        activeTrackColor = Orange,
+                        inactiveTrackColor = Color.Black.copy(alpha = 0.2f)
                     )
                 )
             }
@@ -185,12 +178,13 @@ fun SettingsScreen(
             Spacer(Modifier.height(16.dp))
 
             // ---- App Section ----
-            SettingsSection(title = "App") {
+            SettingsSection(title = "App", cardBg = cardBg) {
                 SettingsToggleRow(
                     label = "Dark mode",
                     description = "Switch theme appearance.",
                     checked = darkModeEnabled,
-                    onCheckedChange = { darkModeEnabled = it }
+                    onCheckedChange = { darkModeEnabled = it },
+                    orange = Orange
                 )
 
                 Spacer(Modifier.height(10.dp))
@@ -198,7 +192,7 @@ fun SettingsScreen(
                 SettingsClickableRow(
                     label = "About",
                     description = "Version, credits, and info.",
-                    onClick = { /* UI-only: could show dialog later */ }
+                    onClick = { /* UI-only */ }
                 )
             }
 
@@ -208,9 +202,9 @@ fun SettingsScreen(
             Button(
                 onClick = onLogout,
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = NeonOrange)
+                colors = ButtonDefaults.buttonColors(containerColor = Orange)
             ) {
-                Text("Log Out", color = Color.Black, fontWeight = FontWeight.Bold)
+                Text("Log Out", color = Color.White, fontWeight = FontWeight.Bold)
             }
 
             Spacer(Modifier.height(10.dp))
@@ -221,14 +215,16 @@ fun SettingsScreen(
 @Composable
 private fun SettingsSection(
     title: String,
+    cardBg: Color,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = CardBg)
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = cardBg)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(title, fontWeight = FontWeight.Bold, color = Color.Black)
+        Column(modifier = Modifier.padding(20.dp)) {
+            Text(title, fontWeight = FontWeight.Bold, color = Color.Black, fontSize = 18.sp)
             Spacer(Modifier.height(12.dp))
             content()
         }
@@ -240,7 +236,8 @@ private fun SettingsToggleRow(
     label: String,
     description: String,
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
+    orange: Color
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -254,8 +251,8 @@ private fun SettingsToggleRow(
             checked = checked,
             onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(
-                checkedThumbColor = Color.Black,
-                checkedTrackColor = NeonOrange
+                checkedThumbColor = Color.White,
+                checkedTrackColor = orange
             )
         )
     }
@@ -269,7 +266,8 @@ private fun SettingsClickableRow(
 ) {
     TextButton(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(0.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(label, color = Color.Black, fontWeight = FontWeight.SemiBold)
