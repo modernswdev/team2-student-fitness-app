@@ -1,22 +1,25 @@
 package com.team2.studentfitness.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.MonitorWeight
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,183 +28,371 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.team2.studentfitness.DatabaseCreation
 import com.team2.studentfitness.R
+import com.team2.studentfitness.database.HealthData
+import com.team2.studentfitness.database.MentalHealth
+import com.team2.studentfitness.ui.navigation.AppRoutes
+import com.team2.studentfitness.ui.theme.*
 import kotlinx.coroutines.launch
-import com.team2.studentfitness.ui.theme.Teal
-import com.team2.studentfitness.ui.theme.Mint
-import com.team2.studentfitness.ui.theme.Orange
-import com.team2.studentfitness.ui.theme.StudentFitnessTheme
+import java.util.Calendar
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Dashboard(navController: NavController) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val database = (context.applicationContext as DatabaseCreation).database
     val settingsDao = database.settingsDao()
+    val mentalHealthDao = database.mentalHealthDao()
     val healthDao = database.healthDao()
 
-    var userName by remember { mutableStateOf("User") }
-    var userWeight by remember { mutableStateOf("0.0") }
+    var userName by remember { mutableStateOf("Student") }
+    var selectedTab by remember { mutableStateOf("Workout") }
+    
+    // Health State
+    var latestHealthData by remember { mutableStateOf<HealthData?>(null) }
+    
+    // Mental Health State
+    var selectedMood by remember { mutableStateOf("") }
+    var reflectionText by remember { mutableStateOf("") }
+
+    val greeting = when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
+        in 0..11 -> "Good Morning,"
+        in 12..16 -> "Good Afternoon,"
+        else -> "Good Evening,"
+    }
 
     LaunchedEffect(Unit) {
         try {
-            // Fetch the latest user settings and health data
             val latestSettings = settingsDao.getLatest()
             if (latestSettings != null) {
                 userName = latestSettings.name
             }
-            
-            val latestHealth = healthDao.getLatest()
-            if (latestHealth != null) {
-                userWeight = latestHealth.weight.toString()
-            }
-        } catch (e: Exception) {
-            // Fallback if not found
+            latestHealthData = healthDao.getLatest()
+        } catch (_: Exception) {
+            // Suppress unused exception warning
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                            contentDescription = "Profile Picture",
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.secondaryContainer)
-                        )
-                        Column(modifier = Modifier.padding(start = 12.dp)) {
-                            Text(
-                                text = "Hey, $userName",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = Color.White
-                            )
-                            Text(
-                                text = "Pro Member",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.White.copy(alpha = 0.7f)
-                            )
-                        }
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "More Options",
-                            tint = Color.White
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Teal,
-                    titleContentColor = Color.White
-                )
-            )
-        },
-        containerColor = MaterialTheme.colorScheme.background
-    ) { padding ->
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Teal)
+    ) {
         Column(
             modifier = Modifier
-                .padding(padding)
-                .padding(horizontal = 16.dp)
                 .fillMaxSize()
+                .padding(24.dp)
         ) {
-            var searchQuery by remember { mutableStateOf("") }
-            
-            Spacer(modifier = Modifier.height(16.dp))
+            // Header
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Column {
+                    Text(
+                        text = greeting,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color.Black.copy(alpha = 0.8f)
+                    )
+                    Text(
+                        text = userName,
+                        style = MaterialTheme.typography.headlineLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(CircleShape)
+                        .background(Orange)
+                        .clickable { navController.navigate(AppRoutes.Settings) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Settings",
+                        tint = Color.White,
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
+            }
 
-            TextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                placeholder = { Text("Search metrics...", color = Color.Gray) },
-                leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = "Search", tint = Teal) },
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Tab Selector
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = Teal,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                singleLine = true
-            )
+                    .height(56.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.White),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TabButton(
+                    text = "Workout",
+                    isSelected = selectedTab == "Workout",
+                    modifier = Modifier.weight(1f),
+                    onClick = { selectedTab = "Workout" }
+                )
+                TabButton(
+                    text = "Mental Health",
+                    isSelected = selectedTab == "Mental Health",
+                    modifier = Modifier.weight(1f),
+                    onClick = { selectedTab = "Mental Health" }
+                )
+            }
 
-            Text(
-                text = "Smart Health Metrics",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = Teal,
-                modifier = Modifier.padding(top = 24.dp, bottom = 12.dp)
-            )
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // METRIC CARDS
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    HealthMetricCard(title = "Current Weight", value = "$userWeight kg", color = Teal, modifier = Modifier.weight(1f)) {
-                        navController.navigate("detail/Weight")
+            // Content Area
+            if (selectedTab == "Workout") {
+                WorkoutTabContent(navController, latestHealthData)
+            } else {
+                MentalHealthTabContent(
+                    selectedMood = selectedMood,
+                    onMoodSelected = { selectedMood = it },
+                    reflectionText = reflectionText,
+                    onReflectionChanged = { reflectionText = it },
+                    onSave = {
+                        scope.launch {
+                            mentalHealthDao.insert(
+                                MentalHealth(mood = selectedMood, reflection = reflectionText)
+                            )
+                            reflectionText = ""
+                            selectedMood = ""
+                        }
                     }
-                    HealthMetricCard(title = "Heart Rate", value = "70 bpm", color = Mint, modifier = Modifier.weight(1f)) {
-                        navController.navigate("detail/Heart Rate")
-                    }
-                }
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    HealthMetricCard(title = "Calories Burned", value = "430 kcal", color = Orange, modifier = Modifier.weight(1f)) {
-                        navController.navigate("detail/Calories")
-                    }
-                    HealthMetricCard(title = "Gym Hours", value = "8am-10pm", color = Teal, modifier = Modifier.weight(1f)) {
-                        navController.navigate("detail/Gym Hours")
-                    }
-                }
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    HealthMetricCard(title = "Workout Timer", value = "30 min", color = Orange, modifier = Modifier.weight(1f)) {
-                        navController.navigate("detail/Workout Timer")
-                    }
-                    HealthMetricCard(title = "Protein Intake", value = "80g / 120g", color = Orange, modifier = Modifier.weight(1f)) {
-                        navController.navigate("detail/Protein Intake")
-                    }
-                }
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    HealthMetricCard(title = "Workout Tutorials", value = "Learn", color = Mint, modifier = Modifier.weight(1f)) {
-                        navController.navigate("detail/Workout Tutorials")
-                    }
-                    HealthMetricCard(title = "Mental Health", value = "Breathing", color = Teal, modifier = Modifier.weight(1f)) {
-                        navController.navigate("detail/Mental Health")
-                    }
-                }
+                )
             }
         }
     }
 }
 
 @Composable
-fun HealthMetricCard(title: String, value: String, color: Color, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun TabButton(text: String, isSelected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Box(
+        modifier = modifier
+            .fillMaxHeight()
+            .padding(4.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(if (isSelected) Orange else Color.Transparent)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            color = if (isSelected) Color.White else Color.Black,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+fun WorkoutTabContent(navController: NavController, healthData: HealthData?) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+    ) {
+        // Workout Progress Card
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF648CF4))
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Today's Progress",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Workout Pending", // or "Workout Completed" based on logic
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color.Black
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = { navController.navigate(AppRoutes.detail("Workouts")) },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 24.dp)
+                    ) {
+                        Text("Start Workout", color = Color.Black, fontWeight = FontWeight.Bold)
+                    }
+                }
+                
+                Box(contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(
+                        progress = { 0f }, // 1f if completed
+                        modifier = Modifier.size(80.dp),
+                        color = Color.White,
+                        strokeWidth = 8.dp,
+                        trackColor = Color.White.copy(alpha = 0.3f)
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Health Stat Cards
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            StatCard(
+                title = "Weight",
+                value = if (healthData != null) "${healthData.weight}kg" else "--",
+                icon = Icons.Default.MonitorWeight,
+                modifier = Modifier.weight(1f),
+                onClick = { navController.navigate(AppRoutes.detail("Weight")) }
+            )
+            StatCard(
+                title = "Calories",
+                value = "1200 / 2500", // Example data
+                icon = Icons.Default.Restaurant,
+                modifier = Modifier.weight(1f),
+                onClick = { navController.navigate(AppRoutes.detail("Calories")) }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@Composable
+fun StatCard(
+    title: String,
+    value: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
     Card(
         modifier = modifier
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            .height(100.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFAF3F3))
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = title, 
-                style = MaterialTheme.typography.titleSmall, 
-                color = Color.Gray,
-                fontWeight = FontWeight.Medium
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                tint = Teal,
+                modifier = Modifier.size(32.dp)
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = value, 
-                style = MaterialTheme.typography.titleLarge, 
-                color = color, 
-                fontWeight = FontWeight.Bold
-            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(text = title, style = MaterialTheme.typography.labelMedium, color = Color.Gray)
+                Text(text = value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.Black)
+            }
+        }
+    }
+}
+
+@Composable
+fun MentalHealthTabContent(
+    selectedMood: String,
+    onMoodSelected: (String) -> Unit,
+    reflectionText: String,
+    onReflectionChanged: (String) -> Unit,
+    onSave: () -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFFAF3F3))
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "How are you feeling?",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    val moods = listOf("😔", "😐", "🙂", "🤩")
+                    moods.forEach { mood ->
+                        Text(
+                            text = mood,
+                            fontSize = 32.sp,
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .background(if (selectedMood == mood) Color.LightGray else Color.Transparent)
+                                .clickable { onMoodSelected(mood) }
+                                .padding(8.dp)
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFFAF3F3))
+        ) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                Text(
+                    text = "Daily Reflection",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                TextField(
+                    value = reflectionText,
+                    onValueChange = onReflectionChanged,
+                    placeholder = { Text("What's on your mind?") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(120.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = onSave,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB099FF)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Save Note", color = Color.White, fontWeight = FontWeight.Bold)
+                }
+            }
         }
     }
 }
