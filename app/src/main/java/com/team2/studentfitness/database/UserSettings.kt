@@ -18,6 +18,11 @@ data class UserSettings (
     @ColumnInfo(name = "homeGym")
     val homeGym: Int,
     @ColumnInfo(name = "loginCount")
-    val loginCount: Int
+    val loginCount: Int,
+    @ColumnInfo(name = "isMetric", defaultValue = "1")
+    val isMetric: Boolean = true,
+    @ColumnInfo(name = "sex", defaultValue = "MALE")
+    val sex: String = "MALE",
+    @ColumnInfo(name = "activityLevel", defaultValue = "SEDENTARY")
+    val activityLevel: String = "SEDENTARY"
 )
-

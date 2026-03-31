@@ -52,4 +52,7 @@ interface SettingsDao {
     //Increment login count by 1
     @Query("UPDATE usersettings SET loginCount = loginCount + 1 WHERE uid = :uid")
     suspend fun incrementLoginCount(uid: Int)
+
+    @Query("UPDATE usersettings SET isMetric = :isMetric WHERE uid = :uid")
+    suspend fun updateIsMetric(isMetric: Boolean, uid: Int)
 }

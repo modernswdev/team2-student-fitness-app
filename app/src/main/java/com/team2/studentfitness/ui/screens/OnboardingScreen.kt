@@ -1,5 +1,6 @@
 package com.team2.studentfitness.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -12,6 +13,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.team2.studentfitness.viewmodels.OnboardingViewModel
+import com.team2.studentfitness.viewmodels.HealthCalculations
 
 @Composable
 fun OnboardingScreen(
@@ -24,6 +26,10 @@ fun OnboardingScreen(
     var height by remember { mutableStateOf("") }
     var setPin by remember { mutableStateOf(false) }
     var pin by remember { mutableStateOf("") }
+    
+    var isMetric by remember { mutableStateOf(true) }
+    var selectedSex by remember { mutableStateOf(HealthCalculations.Sex.MALE) }
+    var selectedActivityLevel by remember { mutableStateOf(HealthCalculations.ActivityLevel.SEDENTARY) }
 
     val scrollState = rememberScrollState()
 
@@ -44,7 +50,24 @@ fun OnboardingScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
+        Text("Unit Preference", style = MaterialTheme.typography.titleMedium)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            RadioButton(selected = isMetric, onClick = { isMetric = true })
+            Text("Metric (kg, cm)")
+            Spacer(modifier = Modifier.width(16.dp))
+            RadioButton(selected = !isMetric, onClick = { isMetric = false })
+            Text("Imperial (lb, in)")
+        }
+
         Text("Personal Info", style = MaterialTheme.typography.titleMedium)
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            RadioButton(selected = selectedSex == HealthCalculations.Sex.MALE, onClick = { selectedSex = HealthCalculations.Sex.MALE })
+            Text("Male")
+            Spacer(modifier = Modifier.width(16.dp))
+            RadioButton(selected = selectedSex == HealthCalculations.Sex.FEMALE, onClick = { selectedSex = HealthCalculations.Sex.FEMALE })
+            Text("Female")
+        }
 
         OutlinedTextField(
             value = age,
@@ -57,7 +80,7 @@ fun OnboardingScreen(
         OutlinedTextField(
             value = weight,
             onValueChange = { weight = it },
-            label = { Text("Weight (kg)") },
+            label = { Text(if (isMetric) "Weight (kg)" else "Weight (lb)") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             modifier = Modifier.fillMaxWidth()
         )
@@ -65,10 +88,21 @@ fun OnboardingScreen(
         OutlinedTextField(
             value = height,
             onValueChange = { height = it },
-            label = { Text("Height (cm)") },
+            label = { Text(if (isMetric) "Height (cm)" else "Height (in)") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             modifier = Modifier.fillMaxWidth()
         )
+
+        Text("Activity Level", style = MaterialTheme.typography.titleMedium)
+        HealthCalculations.ActivityLevel.entries.forEach { level ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().clickable { selectedActivityLevel = level }
+            ) {
+                RadioButton(selected = selectedActivityLevel == level, onClick = { selectedActivityLevel = level })
+                Text(level.name.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() })
+            }
+        }
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -97,11 +131,14 @@ fun OnboardingScreen(
                     weight = weight.toFloatOrNull() ?: 0f,
                     height = height.toFloatOrNull() ?: 0f,
                     pin = if (setPin) pin.toIntOrNull() else null,
+                    isMetric = isMetric,
+                    sex = selectedSex.name,
+                    activityLevel = selectedActivityLevel.name,
                     onComplete = onOnboardingComplete
                 )
             },
             modifier = Modifier.fillMaxWidth(),
-            enabled = name.isNotBlank()
+            enabled = name.isNotBlank() && age.isNotBlank() && weight.isNotBlank() && height.isNotBlank()
         ) {
             Text("Complete Onboarding")
         }

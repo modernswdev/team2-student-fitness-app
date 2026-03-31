@@ -8,12 +8,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.team2.studentfitness.DatabaseCreation
+import com.team2.studentfitness.database.UserSettings
 import com.team2.studentfitness.ui.theme.Teal
 import com.team2.studentfitness.ui.theme.Orange
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -22,18 +26,34 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
     onLogout: () -> Unit = {},
 ) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val database = (context.applicationContext as DatabaseCreation).database
+    val settingsDao = database.settingsDao()
+
     val gyms = remember {
         listOf("UALR Fitness Center", "Planet Fitness", "LA Fitness", "Anytime Fitness", "Other")
     }
 
+    var userSettings by remember { mutableStateOf<UserSettings?>(null) }
+    
     var homeGym by remember { mutableStateOf(gyms.first()) }
     var gymDropdownExpanded by remember { mutableStateOf(false) }
 
     var remindersEnabled by remember { mutableStateOf(true) }
     var darkModeEnabled by remember { mutableStateOf(false) }
 
-    var useMetric by remember { mutableStateOf(false) } // false = imperial
+    var useMetric by remember { mutableStateOf(true) }
     var weeklyGoal by remember { mutableStateOf(3f) } // 0..7
+
+    LaunchedEffect(Unit) {
+        userSettings = settingsDao.getLatest()
+        userSettings?.let {
+            useMetric = it.isMetric
+            remindersEnabled = it.notifsOn
+            // ... load others if needed
+        }
+    }
 
     val cardBg = Color(0xFFFAF3F3)
 
@@ -116,7 +136,12 @@ fun SettingsScreen(
                     label = "Gym reminders",
                     description = "Get nudges to stay consistent.",
                     checked = remindersEnabled,
-                    onCheckedChange = { remindersEnabled = it },
+                    onCheckedChange = { 
+                        remindersEnabled = it
+                        userSettings?.let { settings ->
+                            scope.launch { settingsDao.updateNotifs(it, settings.uid) }
+                        }
+                    },
                     orange = Orange
                 )
             }
@@ -131,7 +156,12 @@ fun SettingsScreen(
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     FilterChip(
                         selected = !useMetric,
-                        onClick = { useMetric = false },
+                        onClick = { 
+                            useMetric = false
+                            userSettings?.let { settings ->
+                                scope.launch { settingsDao.updateIsMetric(false, settings.uid) }
+                            }
+                        },
                         label = { Text("Imperial") },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = Orange,
@@ -141,7 +171,12 @@ fun SettingsScreen(
                     )
                     FilterChip(
                         selected = useMetric,
-                        onClick = { useMetric = true },
+                        onClick = { 
+                            useMetric = true
+                            userSettings?.let { settings ->
+                                scope.launch { settingsDao.updateIsMetric(true, settings.uid) }
+                            }
+                        },
                         label = { Text("Metric") },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = Orange,

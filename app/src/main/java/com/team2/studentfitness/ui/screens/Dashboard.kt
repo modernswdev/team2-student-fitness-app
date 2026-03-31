@@ -9,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MonitorWeight
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
@@ -30,10 +29,13 @@ import com.team2.studentfitness.DatabaseCreation
 import com.team2.studentfitness.R
 import com.team2.studentfitness.database.HealthData
 import com.team2.studentfitness.database.MentalHealth
+import com.team2.studentfitness.database.UserSettings
 import com.team2.studentfitness.ui.navigation.AppRoutes
 import com.team2.studentfitness.ui.theme.*
+import com.team2.studentfitness.viewmodels.HealthCalculations
 import kotlinx.coroutines.launch
 import java.util.Calendar
+import java.util.Locale
 
 @Composable
 fun Dashboard(navController: NavController) {
@@ -49,6 +51,7 @@ fun Dashboard(navController: NavController) {
     
     // Health State
     var latestHealthData by remember { mutableStateOf<HealthData?>(null) }
+    var userSettings by remember { mutableStateOf<UserSettings?>(null) }
     
     // Mental Health State
     var selectedMood by remember { mutableStateOf("") }
@@ -62,9 +65,9 @@ fun Dashboard(navController: NavController) {
 
     LaunchedEffect(Unit) {
         try {
-            val latestSettings = settingsDao.getLatest()
-            if (latestSettings != null) {
-                userName = latestSettings.name
+            userSettings = settingsDao.getLatest()
+            userSettings?.let {
+                userName = it.name
             }
             latestHealthData = healthDao.getLatest()
         } catch (_: Exception) {
@@ -147,7 +150,7 @@ fun Dashboard(navController: NavController) {
 
             // Content Area
             if (selectedTab == "Workout") {
-                WorkoutTabContent(navController, latestHealthData)
+                WorkoutTabContent(navController, latestHealthData, userSettings)
             } else {
                 MentalHealthTabContent(
                     selectedMood = selectedMood,
@@ -189,7 +192,36 @@ fun TabButton(text: String, isSelected: Boolean, modifier: Modifier = Modifier, 
 }
 
 @Composable
-fun WorkoutTabContent(navController: NavController, healthData: HealthData?) {
+fun WorkoutTabContent(navController: NavController, healthData: HealthData?, userSettings: UserSettings?) {
+    val healthCalc = remember { HealthCalculations() }
+    
+    val calorieGoal = if (healthData != null && userSettings != null) {
+        val bmr = healthCalc.calculateBmrMifflinStJeor(
+            weightKg = healthData.weight.toDouble(),
+            heightCm = healthData.height.toDouble(),
+            ageYears = healthData.age,
+            sex = try { HealthCalculations.Sex.valueOf(userSettings.sex) } catch(_: Exception) { HealthCalculations.Sex.MALE }
+        )
+        val activityLevel = try { 
+            HealthCalculations.ActivityLevel.valueOf(userSettings.activityLevel) 
+        } catch(_: Exception) { 
+            HealthCalculations.ActivityLevel.SEDENTARY 
+        }
+        healthCalc.calculateTdee(bmr, activityLevel).toInt()
+    } else {
+        2000 // Default
+    }
+
+    val weightDisplay = if (healthData != null) {
+        if (userSettings?.isMetric != false) {
+            String.format(Locale.US, "%.2fkg", healthData.weight)
+        } else {
+            "${(healthData.weight * 2.20462f).toInt()}lb"
+        }
+    } else {
+        "--"
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -255,14 +287,14 @@ fun WorkoutTabContent(navController: NavController, healthData: HealthData?) {
         ) {
             StatCard(
                 title = "Weight",
-                value = if (healthData != null) "${healthData.weight}kg" else "--",
+                value = weightDisplay,
                 icon = Icons.Default.MonitorWeight,
                 modifier = Modifier.weight(1f),
                 onClick = { navController.navigate(AppRoutes.detail("Weight")) }
             )
             StatCard(
                 title = "Calories",
-                value = "1200 / 2500", // Example data
+                value = "0 / $calorieGoal", // Showing 0 consumed for now
                 icon = Icons.Default.Restaurant,
                 modifier = Modifier.weight(1f),
                 onClick = { navController.navigate(AppRoutes.detail("Calories")) }
