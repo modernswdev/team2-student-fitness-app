@@ -41,8 +41,11 @@ class SettingsDaoTest {
             name = "John Doe",
             notifsOn = true,
             theme = 1,
-            homeGym = 101,
-            loginCount = 5
+            homeGym = 0,
+            loginCount = 5,
+            isMetric = true,
+            sex = "MALE",
+            activityLevel = "MODERATE"
         )
         settingsDao.insert(settings)
         val result = settingsDao.getById(1)
@@ -50,22 +53,44 @@ class SettingsDaoTest {
         assertEquals("John Doe", result.name)
         assertEquals(true, result.notifsOn)
         assertEquals(1, result.theme)
-        assertEquals(5, result.loginCount)
+        assertEquals(true, result.isMetric)
+        assertEquals("MALE", result.sex)
+        assertEquals("MODERATE", result.activityLevel)
     }
 
     @Test
-    fun updateTheme() = runTest {
-        val settings = UserSettings(1, "User", true, 1, 101, 0)
+    fun updateDarkMode() = runTest {
+        val settings = UserSettings(1, "User", true, 0, 0, 0)
         settingsDao.insert(settings)
         
-        settingsDao.updateTheme(2, 1)
+        settingsDao.updateDarkMode(1, 1)
         val theme = settingsDao.getTheme(1)
-        assertEquals(2, theme)
+        assertEquals(1, theme)
+    }
+
+    @Test
+    fun updateIsMetric() = runTest {
+        val settings = UserSettings(1, "User", true, 1, 0, 0, isMetric = true)
+        settingsDao.insert(settings)
+        
+        settingsDao.updateIsMetric(false, 1)
+        val result = settingsDao.getById(1)
+        assertEquals(false, result.isMetric)
+    }
+
+    @Test
+    fun updateHomeGym() = runTest {
+        val settings = UserSettings(1, "User", true, 1, 0, 0)
+        settingsDao.insert(settings)
+        
+        settingsDao.updateHomeGym(2, 1)
+        val result = settingsDao.getById(1)
+        assertEquals(2, result.homeGym)
     }
 
     @Test
     fun updateNotifs() = runTest {
-        val settings = UserSettings(1, "User", true, 1, 101, 0)
+        val settings = UserSettings(1, "User", true, 1, 0, 0)
         settingsDao.insert(settings)
         
         settingsDao.updateNotifs(false, 1)
@@ -74,18 +99,8 @@ class SettingsDaoTest {
     }
 
     @Test
-    fun incrementLoginCount() = runTest {
-        val settings = UserSettings(1, "User", true, 1, 101, 10)
-        settingsDao.insert(settings)
-        
-        settingsDao.incrementLoginCount(1)
-        val loginCount = settingsDao.getLoginCount(1)
-        assertEquals(11, loginCount)
-    }
-
-    @Test
     fun deleteSettings() = runTest {
-        val settings = UserSettings(1, "User", true, 1, 101, 0)
+        val settings = UserSettings(1, "User", true, 1, 0, 0)
         settingsDao.insert(settings)
         settingsDao.delete(settings)
         
