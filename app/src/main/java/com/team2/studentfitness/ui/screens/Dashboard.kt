@@ -195,6 +195,78 @@ fun TabButton(text: String, isSelected: Boolean, modifier: Modifier = Modifier, 
 }
 
 @Composable
+fun GymStatusCard(userSettings: UserSettings?) {
+    val gymNames = listOf("UALR Fitness Center", "Planet Fitness", "LA Fitness", "Anytime Fitness", "Other")
+    val gymIndex = userSettings?.homeGym ?: 0
+    val gymName = if (gymIndex in gymNames.indices) gymNames[gymIndex] else "Gym"
+    
+    val (hoursText, isOpen) = remember(gymIndex) {
+        val calendar = Calendar.getInstance()
+        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+        
+        if (gymIndex == 0) { // UALR Fitness Center
+            val (open, close, text) = when (dayOfWeek) {
+                Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY -> Triple(6, 23, "6 a.m. – 11 p.m.")
+                Calendar.FRIDAY -> Triple(6, 19, "6 a.m. – 7 p.m.")
+                Calendar.SATURDAY -> Triple(11, 19, "11 a.m. – 7 p.m.")
+                Calendar.SUNDAY -> Triple(11, 23, "11 a.m. – 11 p.m.")
+                else -> Triple(0, 0, "Closed")
+            }
+            Triple(text, hour in open until close, Unit)
+        } else {
+            Triple("24 Hours", true, Unit)
+        }
+    }.let { it.first to it.second }
+
+    val isDark = userSettings?.theme == 1
+    val cardBg = if (isDark) Color(0xFF1E1E1E) else Color(0xFFFAF3F3)
+    val textColor = if (isDark) Color.White else Color.Black
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = cardBg)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text(
+                    text = gymName,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = textColor
+                )
+                Text(
+                    text = "Today: $hoursText",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = textColor.copy(alpha = 0.7f)
+                )
+            }
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = if (isOpen) Color(0xFF4CAF50).copy(alpha = 0.2f) else Color(0xFFF44336).copy(alpha = 0.2f)
+            ) {
+                Text(
+                    text = if (isOpen) "OPEN" else "CLOSED",
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    color = if (isOpen) Color(0xFF4CAF50) else Color(0xFFF44336),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun WorkoutTabContent(navController: NavController, healthData: HealthData?, userSettings: UserSettings?) {
     val healthCalc = remember { HealthCalculations() }
     val isDark = userSettings?.theme == 1
@@ -233,6 +305,8 @@ fun WorkoutTabContent(navController: NavController, healthData: HealthData?, use
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
     ) {
+        GymStatusCard(userSettings)
+
         // Workout Progress Card
         Card(
             modifier = Modifier
