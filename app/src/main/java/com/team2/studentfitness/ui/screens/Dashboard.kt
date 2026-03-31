@@ -2,6 +2,7 @@ package com.team2.studentfitness.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -78,7 +79,7 @@ fun Dashboard(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Teal)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column(
             modifier = Modifier
@@ -91,24 +92,25 @@ fun Dashboard(navController: NavController) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top
             ) {
+                val textColor = if (userSettings?.theme == 1) Color.White else Color.Black
                 Column {
                     Text(
                         text = greeting,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = Color.Black.copy(alpha = 0.8f)
+                        color = textColor.copy(alpha = 0.8f)
                     )
                     Text(
                         text = userName,
                         style = MaterialTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        color = textColor
                     )
                 }
                 Box(
                     modifier = Modifier
                         .size(50.dp)
                         .clip(CircleShape)
-                        .background(Orange)
+                        .background(MaterialTheme.colorScheme.secondary)
                         .clickable { navController.navigate(AppRoutes.Settings) },
                     contentAlignment = Alignment.Center
                 ) {
@@ -129,7 +131,7 @@ fun Dashboard(navController: NavController) {
                     .fillMaxWidth()
                     .height(56.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(Color.White),
+                    .background(if (userSettings?.theme == 1) Color.DarkGray else Color.White),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TabButton(
@@ -157,6 +159,7 @@ fun Dashboard(navController: NavController) {
                     onMoodSelected = { selectedMood = it },
                     reflectionText = reflectionText,
                     onReflectionChanged = { reflectionText = it },
+                    userSettings = userSettings,
                     onSave = {
                         scope.launch {
                             mentalHealthDao.insert(
@@ -179,13 +182,13 @@ fun TabButton(text: String, isSelected: Boolean, modifier: Modifier = Modifier, 
             .fillMaxHeight()
             .padding(4.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(if (isSelected) Orange else Color.Transparent)
+            .background(if (isSelected) MaterialTheme.colorScheme.secondary else Color.Transparent)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
-            color = if (isSelected) Color.White else Color.Black,
+            color = if (isSelected) Color.White else (if (isSystemInDarkTheme()) Color.White else Color.Black),
             fontWeight = FontWeight.Bold
         )
     }
@@ -194,6 +197,9 @@ fun TabButton(text: String, isSelected: Boolean, modifier: Modifier = Modifier, 
 @Composable
 fun WorkoutTabContent(navController: NavController, healthData: HealthData?, userSettings: UserSettings?) {
     val healthCalc = remember { HealthCalculations() }
+    val isDark = userSettings?.theme == 1
+    val textColor = if (isDark) Color.White else Color.Black
+    val cardBg = if (isDark) Color(0xFF1E1E1E) else Color(0xFFFAF3F3)
     
     val calorieGoal = if (healthData != null && userSettings != null) {
         val bmr = healthCalc.calculateBmrMifflinStJeor(
@@ -233,7 +239,7 @@ fun WorkoutTabContent(navController: NavController, healthData: HealthData?, use
                 .fillMaxWidth()
                 .height(180.dp),
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF648CF4))
+            colors = CardDefaults.cardColors(containerColor = if (isDark) Color.DarkGray else Color(0xFF648CF4))
         ) {
             Row(
                 modifier = Modifier
@@ -247,13 +253,13 @@ fun WorkoutTabContent(navController: NavController, healthData: HealthData?, use
                         text = "Today's Progress",
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        color = if (isDark) Color.White else Color.Black
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Workout Pending", // or "Workout Completed" based on logic
+                        text = "Workout Pending", 
                         style = MaterialTheme.typography.bodyLarge,
-                        color = Color.Black
+                        color = if (isDark) Color.LightGray else Color.Black
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
@@ -268,7 +274,7 @@ fun WorkoutTabContent(navController: NavController, healthData: HealthData?, use
                 
                 Box(contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(
-                        progress = { 0f }, // 1f if completed
+                        progress = { 0f }, 
                         modifier = Modifier.size(80.dp),
                         color = Color.White,
                         strokeWidth = 8.dp,
@@ -290,13 +296,17 @@ fun WorkoutTabContent(navController: NavController, healthData: HealthData?, use
                 value = weightDisplay,
                 icon = Icons.Default.MonitorWeight,
                 modifier = Modifier.weight(1f),
+                cardBg = cardBg,
+                textColor = textColor,
                 onClick = { navController.navigate(AppRoutes.detail("Weight")) }
             )
             StatCard(
                 title = "Calories",
-                value = "0 / $calorieGoal", // Showing 0 consumed for now
+                value = "0 / $calorieGoal", 
                 icon = Icons.Default.Restaurant,
                 modifier = Modifier.weight(1f),
+                cardBg = cardBg,
+                textColor = textColor,
                 onClick = { navController.navigate(AppRoutes.detail("Calories")) }
             )
         }
@@ -311,6 +321,8 @@ fun StatCard(
     value: String,
     icon: ImageVector,
     modifier: Modifier = Modifier,
+    cardBg: Color = Color(0xFFFAF3F3),
+    textColor: Color = Color.Black,
     onClick: () -> Unit = {}
 ) {
     Card(
@@ -318,7 +330,7 @@ fun StatCard(
             .height(100.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFAF3F3))
+        colors = CardDefaults.cardColors(containerColor = cardBg)
     ) {
         Row(
             modifier = Modifier
@@ -329,13 +341,13 @@ fun StatCard(
             Icon(
                 imageVector = icon,
                 contentDescription = title,
-                tint = Teal,
+                tint = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.size(32.dp)
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(text = title, style = MaterialTheme.typography.labelMedium, color = Color.Gray)
-                Text(text = value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.Black)
+                Text(text = value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = textColor)
             }
         }
     }
@@ -347,13 +359,18 @@ fun MentalHealthTabContent(
     onMoodSelected: (String) -> Unit,
     reflectionText: String,
     onReflectionChanged: (String) -> Unit,
+    userSettings: UserSettings?,
     onSave: () -> Unit
 ) {
+    val isDark = userSettings?.theme == 1
+    val textColor = if (isDark) Color.White else Color.Black
+    val cardBg = if (isDark) Color(0xFF1E1E1E) else Color(0xFFFAF3F3)
+
     Column(modifier = Modifier.fillMaxWidth()) {
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFFAF3F3))
+            colors = CardDefaults.cardColors(containerColor = cardBg)
         ) {
             Column(
                 modifier = Modifier.padding(20.dp),
@@ -362,7 +379,7 @@ fun MentalHealthTabContent(
                 Text(
                     text = "How are you feeling?",
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color.Black
+                    color = textColor
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(
@@ -390,28 +407,30 @@ fun MentalHealthTabContent(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFFAF3F3))
+            colors = CardDefaults.cardColors(containerColor = cardBg)
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Text(
                     text = "Daily Reflection",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = textColor
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 TextField(
                     value = reflectionText,
                     onValueChange = onReflectionChanged,
-                    placeholder = { Text("What's on your mind?") },
+                    placeholder = { Text("What's on your mind?", color = textColor.copy(alpha = 0.5f)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(120.dp),
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
+                        focusedContainerColor = if (isDark) Color.DarkGray else Color.White,
+                        unfocusedContainerColor = if (isDark) Color.DarkGray else Color.White,
                         focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
+                        unfocusedIndicatorColor = Color.Transparent,
+                        focusedTextColor = textColor,
+                        unfocusedTextColor = textColor
                     ),
                     shape = RoundedCornerShape(12.dp)
                 )
