@@ -11,7 +11,7 @@ import androidx.compose.material.icons.filled.Build
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import androidx.compose.ui.platform.LocalContext
@@ -46,10 +46,21 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            StudentFitnessTheme {
+            val context = LocalContext.current
+            val database = (application as DatabaseCreation).database
+            val settingsDao = database.settingsDao()
+            
+            var isDarkMode by remember { mutableStateOf(false) }
+            
+            LaunchedEffect(Unit) {
+                settingsDao.getAll().lastOrNull()?.let {
+                    isDarkMode = it.theme == 1
+                }
+            }
+
+            StudentFitnessTheme(darkTheme = isDarkMode) {
                 val navController = rememberNavController()
                 val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route
-                val context = LocalContext.current
 
                 val securePinManager = remember { SecurePinManager(context) }
                 val loginViewModel = remember { LoginViewModel(securePinManager) }
@@ -112,7 +123,8 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate(nextDest) {
                                         popUpTo(AppRoutes.Dashboard) { inclusive = true }
                                     }
-                                }
+                                },
+                                onThemeChanged = { isDarkMode = it }
                             )
                         }
                         composable(
