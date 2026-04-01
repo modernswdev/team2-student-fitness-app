@@ -24,6 +24,9 @@ class OnboardingViewModel(application: Application, private val securePinManager
         weight: Float,
         height: Float,
         pin: Int?,
+        isMetric: Boolean,
+        sex: String,
+        activityLevel: String,
         onComplete: () -> Unit
     ) {
         viewModelScope.launch {
@@ -33,6 +36,10 @@ class OnboardingViewModel(application: Application, private val securePinManager
             val insertedUser = userDatabase.userDao().findByName(name)
             val uid = insertedUser?.uid ?: 0
 
+            // Convert to metric if imperial was chosen
+            val finalWeight = if (isMetric) weight else weight * 0.453592f
+            val finalHeight = if (isMetric) height else height * 2.54f
+
             // 2. Store Health/Biometric Data (Age, Weight, Height)
             val healthData = HealthData(
                 heartRate = 0,
@@ -40,8 +47,8 @@ class OnboardingViewModel(application: Application, private val securePinManager
                 totalSteps = 0,
                 stepCount = 0,
                 age = age,
-                weight = weight,
-                height = height
+                weight = finalWeight,
+                height = finalHeight
             )
             appDatabase.healthDao().insert(healthData)
 
@@ -52,7 +59,10 @@ class OnboardingViewModel(application: Application, private val securePinManager
                 notifsOn = true,
                 theme = 1,
                 homeGym = 0,
-                loginCount = 1
+                loginCount = 1,
+                isMetric = isMetric,
+                sex = sex,
+                activityLevel = activityLevel
             )
             appDatabase.settingsDao().insert(userSettings)
 

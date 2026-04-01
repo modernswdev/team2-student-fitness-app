@@ -34,11 +34,17 @@ fun LoginScreen(
     var pin by remember { mutableStateOf("") }
     val isPinSet = viewModel.isPinSet()
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    
+    val isDark = isSystemInDarkTheme()
+    val bgColor = MaterialTheme.colorScheme.background
+    val accentColor = MaterialTheme.colorScheme.secondary
+    val textColor = if (isDark) Color.White else Color.Black
+    val secondaryTextColor = if (isDark) Color.LightGray else Color.White // Original subtitle was white on teal
 
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(LoginBackground)
+            .background(bgColor)
     ) {
         Column(
             modifier = Modifier
@@ -54,12 +60,12 @@ fun LoginScreen(
                 fontSize = 42.sp,
                 fontWeight = FontWeight.Bold,
                 fontStyle = FontStyle.Italic,
-                color = LoginOrange,
+                color = accentColor,
                 letterSpacing = (-1).sp
             )
             Text(
                 text = "Push both your physical and mental limits.",
-                color = Color.White,
+                color = if (isDark) Color.White else Color.White, // Keep white in light mode for contrast on teal
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 8.dp)
@@ -71,7 +77,7 @@ fun LoginScreen(
             Column(modifier = Modifier.fillMaxWidth(0.9f)) {
                 Text(
                     text = if (isPinSet) "Enter Your PIN" else "Create a Security PIN",
-                    color = Color.Black,
+                    color = if (isDark) Color.White else Color.Black,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -90,12 +96,12 @@ fun LoginScreen(
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = LoginInputBg,
-                        unfocusedContainerColor = LoginInputBg,
+                        focusedContainerColor = if (isDark) Color.DarkGray else LoginInputBg,
+                        unfocusedContainerColor = if (isDark) Color.DarkGray else LoginInputBg,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black
+                        focusedTextColor = if (isDark) Color.White else Color.Black,
+                        unfocusedTextColor = if (isDark) Color.White else Color.Black
                     ),
                     shape = RoundedCornerShape(8.dp),
                     singleLine = true
@@ -136,13 +142,13 @@ fun LoginScreen(
                         }
                     },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = LoginOrange),
+                    colors = ButtonDefaults.buttonColors(containerColor = accentColor),
                     shape = RoundedCornerShape(8.dp),
                     enabled = pin.isNotEmpty()
                 ) {
                     Text(
                         text = if (isPinSet) "Sign In" else "Set PIN & Continue",
-                        color = Color.Black,
+                        color = if (isDark) Color.White else Color.Black,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
                     )
@@ -153,7 +159,7 @@ fun LoginScreen(
                     onClick = onOpenDevMenu,
                     modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp)
                 ) {
-                    Text("Open Dev Menu", color = LoginOrange.copy(alpha = 0.8f), fontSize = 12.sp)
+                    Text("Open Dev Menu", color = accentColor.copy(alpha = 0.8f), fontSize = 12.sp)
                 }
             }
 
@@ -162,20 +168,20 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(0.9f).padding(vertical = 24.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                HorizontalDivider(modifier = Modifier.weight(1f), color = Color.DarkGray.copy(alpha = 0.5f))
-                Text(" OR ", modifier = Modifier.padding(horizontal = 10.dp), color = Color.Black, fontSize = 12.sp)
-                HorizontalDivider(modifier = Modifier.weight(1f), color = Color.DarkGray.copy(alpha = 0.5f))
+                HorizontalDivider(modifier = Modifier.weight(1f), color = if (isDark) Color.Gray else Color.DarkGray.copy(alpha = 0.5f))
+                Text(" OR ", modifier = Modifier.padding(horizontal = 10.dp), color = if (isDark) Color.White else Color.Black, fontSize = 12.sp)
+                HorizontalDivider(modifier = Modifier.weight(1f), color = if (isDark) Color.Gray else Color.DarkGray.copy(alpha = 0.5f))
             }
 
             // GOOGLE BUTTON
             Button(
                 onClick = { /* Google Login */ },
                 modifier = Modifier.fillMaxWidth(0.9f).height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                colors = ButtonDefaults.buttonColors(containerColor = if (isDark) Color.DarkGray else Color.White),
                 shape = RoundedCornerShape(8.dp),
                 border = BorderStroke(1.dp, Color.LightGray)
             ) {
-                Text("Continue with Google", color = Color(0xFF333333))
+                Text("Continue with Google", color = if (isDark) Color.White else Color(0xFF333333))
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -185,7 +191,7 @@ fun LoginScreen(
                 TextButton(onClick = { /* Handle Forgot PIN */ }) {
                     Text(
                         text = "Forgot PIN?",
-                        color = LoginOrange,
+                        color = accentColor,
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
                     )
@@ -194,11 +200,11 @@ fun LoginScreen(
                 Text(
                     text = buildAnnotatedString {
                         append("Secure your account with a ")
-                        withStyle(style = SpanStyle(color = LoginOrange, fontWeight = FontWeight.Bold)) {
+                        withStyle(style = SpanStyle(color = accentColor, fontWeight = FontWeight.Bold)) {
                             append("Personal PIN")
                         }
                     },
-                    color = Color.Black,
+                    color = if (isDark) Color.White else Color.Black,
                     fontSize = 14.sp
                 )
             }
