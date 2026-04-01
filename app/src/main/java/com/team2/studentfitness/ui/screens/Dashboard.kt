@@ -1,22 +1,25 @@
 package com.team2.studentfitness.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.MonitorWeight
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,170 +28,496 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.team2.studentfitness.DatabaseCreation
 import com.team2.studentfitness.R
-import com.team2.studentfitness.database.SettingsDao
+import com.team2.studentfitness.database.HealthData
+import com.team2.studentfitness.database.MentalHealth
+import com.team2.studentfitness.database.UserSettings
+import com.team2.studentfitness.ui.navigation.AppRoutes
+import com.team2.studentfitness.ui.theme.*
+import com.team2.studentfitness.viewmodels.HealthCalculations
 import kotlinx.coroutines.launch
-import com.team2.studentfitness.ui.theme.Teal
-import com.team2.studentfitness.ui.theme.Mint
-import com.team2.studentfitness.ui.theme.Orange
-import com.team2.studentfitness.ui.theme.StudentFitnessTheme
+import java.util.Calendar
+import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Dashboard(navController: NavController) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val database = (context.applicationContext as DatabaseCreation).database
     val settingsDao = database.settingsDao()
+    val mentalHealthDao = database.mentalHealthDao()
+    val healthDao = database.healthDao()
 
-    var userName by remember { mutableStateOf("User") }
+    var userName by remember { mutableStateOf("Student") }
+    var selectedTab by remember { mutableStateOf("Workout") }
+    
+    // Health State
+    var latestHealthData by remember { mutableStateOf<HealthData?>(null) }
+    var userSettings by remember { mutableStateOf<UserSettings?>(null) }
+    
+    // Mental Health State
+    var selectedMood by remember { mutableStateOf("") }
+    var reflectionText by remember { mutableStateOf("") }
+
+    val greeting = when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
+        in 0..11 -> "Good Morning,"
+        in 12..16 -> "Good Afternoon,"
+        else -> "Good Evening,"
+    }
 
     LaunchedEffect(Unit) {
-        // Using uid 1000 from the pre-populated dummyusersettings.csv
-        // For actual integration, should pull uid of currently logged-in user
         try {
-            userName = settingsDao.getName(1000)
-        } catch (e: Exception) {
-            // Fallback if not found
+            userSettings = settingsDao.getLatest()
+            userSettings?.let {
+                userName = it.name
+            }
+            latestHealthData = healthDao.getLatest()
+        } catch (_: Exception) {
+            // Suppress unused exception warning
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                            contentDescription = "Profile Picture",
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.secondaryContainer)
-                        )
-                        Column(modifier = Modifier.padding(start = 12.dp)) {
-                            Text(
-                                text = "Hey, $userName",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = Color.White
-                            )
-                            Text(
-                                text = "Pro Member",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.White.copy(alpha = 0.7f)
-                            )
-                        }
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "More Options",
-                            tint = Color.White
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Teal,
-                    titleContentColor = Color.White
-                )
-            )
-        },
-        containerColor = MaterialTheme.colorScheme.background
-    ) { padding ->
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         Column(
             modifier = Modifier
-                .padding(padding)
-                .padding(horizontal = 16.dp)
                 .fillMaxSize()
+                .padding(24.dp)
         ) {
-            var searchQuery by remember { mutableStateOf("") }
-            
-            Spacer(modifier = Modifier.height(16.dp))
+            // Header
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                val textColor = if (userSettings?.theme == 1) Color.White else Color.Black
+                Column {
+                    Text(
+                        text = greeting,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = textColor.copy(alpha = 0.8f)
+                    )
+                    Text(
+                        text = userName,
+                        style = MaterialTheme.typography.headlineLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = textColor
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.secondary)
+                        .clickable { navController.navigate(AppRoutes.Settings) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Settings",
+                        tint = Color.White,
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
+            }
 
-            TextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                placeholder = { Text("Search metrics...", color = Color.Gray) },
-                leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = "Search", tint = Teal) },
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Tab Selector
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = Teal,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                singleLine = true
-            )
+                    .height(56.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(if (userSettings?.theme == 1) Color.DarkGray else Color.White),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TabButton(
+                    text = "Workout",
+                    isSelected = selectedTab == "Workout",
+                    modifier = Modifier.weight(1f),
+                    onClick = { selectedTab = "Workout" }
+                )
+                TabButton(
+                    text = "Mental Health",
+                    isSelected = selectedTab == "Mental Health",
+                    modifier = Modifier.weight(1f),
+                    onClick = { selectedTab = "Mental Health" }
+                )
+            }
 
-            Text(
-                text = "Smart Health Metrics",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = Teal,
-                modifier = Modifier.padding(top = 24.dp, bottom = 12.dp)
-            )
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // METRIC CARDS
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    HealthMetricCard(title = "Heart Rate", value = "70 bpm", color = Mint, modifier = Modifier.weight(1f)) {
-                        navController.navigate("detail/Heart Rate")
+            // Content Area
+            if (selectedTab == "Workout") {
+                WorkoutTabContent(navController, latestHealthData, userSettings)
+            } else {
+                MentalHealthTabContent(
+                    selectedMood = selectedMood,
+                    onMoodSelected = { selectedMood = it },
+                    reflectionText = reflectionText,
+                    onReflectionChanged = { reflectionText = it },
+                    userSettings = userSettings,
+                    onSave = {
+                        scope.launch {
+                            mentalHealthDao.insert(
+                                MentalHealth(mood = selectedMood, reflection = reflectionText)
+                            )
+                            reflectionText = ""
+                            selectedMood = ""
+                        }
                     }
-                    HealthMetricCard(title = "Calories Burned", value = "430 kcal", color = Orange, modifier = Modifier.weight(1f)) {
-                        navController.navigate("detail/Calories")
-                    }
-                }
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    HealthMetricCard(title = "Gym Hours", value = "8am-10pm", color = Teal, modifier = Modifier.weight(1f)) {
-                        navController.navigate("detail/Gym Hours")
-                    }
-                    HealthMetricCard(title = "Workout Timer", value = "30 min", color = Orange, modifier = Modifier.weight(1f)) {
-                        navController.navigate("detail/Workout Timer")
-                    }
-                }
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    HealthMetricCard(title = "Protein Intake", value = "80g / 120g", color = Orange, modifier = Modifier.weight(1f)) {
-                        navController.navigate("detail/Protein Intake")
-                    }
-                    HealthMetricCard(title = "Workout Tutorials", value = "Learn", color = Mint, modifier = Modifier.weight(1f)) {
-                        navController.navigate("detail/Workout Tutorials")
-                    }
-                }
-                HealthMetricCard(title = "Mental Health", value = "Breathing", color = Teal, modifier = Modifier.fillMaxWidth()) {
-                    navController.navigate("detail/Mental Health")
-                }
+                )
             }
         }
     }
 }
 
 @Composable
-fun HealthMetricCard(title: String, value: String, color: Color, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun TabButton(text: String, isSelected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Box(
+        modifier = modifier
+            .fillMaxHeight()
+            .padding(4.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(if (isSelected) MaterialTheme.colorScheme.secondary else Color.Transparent)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            color = if (isSelected) Color.White else (if (isSystemInDarkTheme()) Color.White else Color.Black),
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+fun GymStatusCard(userSettings: UserSettings?) {
+    val gymNames = listOf("UALR Fitness Center", "Planet Fitness", "LA Fitness", "Anytime Fitness", "Other")
+    val gymIndex = userSettings?.homeGym ?: 0
+    val gymName = if (gymIndex in gymNames.indices) gymNames[gymIndex] else "Gym"
+    
+    val (hoursText, isOpen) = remember(gymIndex) {
+        val calendar = Calendar.getInstance()
+        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+        
+        if (gymIndex == 0) { // UALR Fitness Center
+            val (open, close, text) = when (dayOfWeek) {
+                Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY -> Triple(6, 23, "6 a.m. – 11 p.m.")
+                Calendar.FRIDAY -> Triple(6, 19, "6 a.m. – 7 p.m.")
+                Calendar.SATURDAY -> Triple(11, 19, "11 a.m. – 7 p.m.")
+                Calendar.SUNDAY -> Triple(11, 23, "11 a.m. – 11 p.m.")
+                else -> Triple(0, 0, "Closed")
+            }
+            Triple(text, hour in open until close, Unit)
+        } else {
+            Triple("24 Hours", true, Unit)
+        }
+    }.let { it.first to it.second }
+
+    val isDark = userSettings?.theme == 1
+    val cardBg = if (isDark) Color(0xFF1E1E1E) else Color(0xFFFAF3F3)
+    val textColor = if (isDark) Color.White else Color.Black
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = cardBg)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text(
+                    text = gymName,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = textColor
+                )
+                Text(
+                    text = "Today: $hoursText",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = textColor.copy(alpha = 0.7f)
+                )
+            }
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = if (isOpen) Color(0xFF4CAF50).copy(alpha = 0.2f) else Color(0xFFF44336).copy(alpha = 0.2f)
+            ) {
+                Text(
+                    text = if (isOpen) "OPEN" else "CLOSED",
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    color = if (isOpen) Color(0xFF4CAF50) else Color(0xFFF44336),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun WorkoutTabContent(navController: NavController, healthData: HealthData?, userSettings: UserSettings?) {
+    val healthCalc = remember { HealthCalculations() }
+    val isDark = userSettings?.theme == 1
+    val textColor = if (isDark) Color.White else Color.Black
+    val cardBg = if (isDark) Color(0xFF1E1E1E) else Color(0xFFFAF3F3)
+    
+    val calorieGoal = if (healthData != null && userSettings != null) {
+        val bmr = healthCalc.calculateBmrMifflinStJeor(
+            weightKg = healthData.weight.toDouble(),
+            heightCm = healthData.height.toDouble(),
+            ageYears = healthData.age,
+            sex = try { HealthCalculations.Sex.valueOf(userSettings.sex) } catch(_: Exception) { HealthCalculations.Sex.MALE }
+        )
+        val activityLevel = try { 
+            HealthCalculations.ActivityLevel.valueOf(userSettings.activityLevel) 
+        } catch(_: Exception) { 
+            HealthCalculations.ActivityLevel.SEDENTARY 
+        }
+        healthCalc.calculateTdee(bmr, activityLevel).toInt()
+    } else {
+        2000 // Default
+    }
+
+    val weightDisplay = if (healthData != null) {
+        if (userSettings?.isMetric != false) {
+            String.format(Locale.US, "%.2fkg", healthData.weight)
+        } else {
+            "${(healthData.weight * 2.20462f).toInt()}lb"
+        }
+    } else {
+        "--"
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+    ) {
+        GymStatusCard(userSettings)
+
+        // Workout Progress Card
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = if (isDark) Color.DarkGray else Color(0xFF648CF4))
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Today's Progress",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isDark) Color.White else Color.Black
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Workout Pending", 
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = if (isDark) Color.LightGray else Color.Black
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = { navController.navigate(AppRoutes.detail("Workouts")) },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 24.dp)
+                    ) {
+                        Text("Start Workout", color = Color.Black, fontWeight = FontWeight.Bold)
+                    }
+                }
+                
+                Box(contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(
+                        progress = { 0f }, 
+                        modifier = Modifier.size(80.dp),
+                        color = Color.White,
+                        strokeWidth = 8.dp,
+                        trackColor = Color.White.copy(alpha = 0.3f)
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Health Stat Cards
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            StatCard(
+                title = "Weight",
+                value = weightDisplay,
+                icon = Icons.Default.MonitorWeight,
+                modifier = Modifier.weight(1f),
+                cardBg = cardBg,
+                textColor = textColor,
+                onClick = { navController.navigate(AppRoutes.detail("Weight")) }
+            )
+            StatCard(
+                title = "Calories",
+                value = "0 / $calorieGoal", 
+                icon = Icons.Default.Restaurant,
+                modifier = Modifier.weight(1f),
+                cardBg = cardBg,
+                textColor = textColor,
+                onClick = { navController.navigate(AppRoutes.detail("Calories")) }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@Composable
+fun StatCard(
+    title: String,
+    value: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+    cardBg: Color = Color(0xFFFAF3F3),
+    textColor: Color = Color.Black,
+    onClick: () -> Unit = {}
+) {
     Card(
         modifier = modifier
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            .height(100.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = cardBg)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = title, 
-                style = MaterialTheme.typography.titleSmall, 
-                color = Color.Gray,
-                fontWeight = FontWeight.Medium
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                tint = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.size(32.dp)
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = value, 
-                style = MaterialTheme.typography.titleLarge, 
-                color = color, 
-                fontWeight = FontWeight.Bold
-            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(text = title, style = MaterialTheme.typography.labelMedium, color = Color.Gray)
+                Text(text = value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = textColor)
+            }
+        }
+    }
+}
+
+@Composable
+fun MentalHealthTabContent(
+    selectedMood: String,
+    onMoodSelected: (String) -> Unit,
+    reflectionText: String,
+    onReflectionChanged: (String) -> Unit,
+    userSettings: UserSettings?,
+    onSave: () -> Unit
+) {
+    val isDark = userSettings?.theme == 1
+    val textColor = if (isDark) Color.White else Color.Black
+    val cardBg = if (isDark) Color(0xFF1E1E1E) else Color(0xFFFAF3F3)
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = cardBg)
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "How are you feeling?",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = textColor
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    val moods = listOf("😔", "😐", "🙂", "🤩")
+                    moods.forEach { mood ->
+                        Text(
+                            text = mood,
+                            fontSize = 32.sp,
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .background(if (selectedMood == mood) Color.LightGray else Color.Transparent)
+                                .clickable { onMoodSelected(mood) }
+                                .padding(8.dp)
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = cardBg)
+        ) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                Text(
+                    text = "Daily Reflection",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = textColor
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                TextField(
+                    value = reflectionText,
+                    onValueChange = onReflectionChanged,
+                    placeholder = { Text("What's on your mind?", color = textColor.copy(alpha = 0.5f)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(120.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = if (isDark) Color.DarkGray else Color.White,
+                        unfocusedContainerColor = if (isDark) Color.DarkGray else Color.White,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        focusedTextColor = textColor,
+                        unfocusedTextColor = textColor
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = onSave,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB099FF)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Save Note", color = Color.White, fontWeight = FontWeight.Bold)
+                }
+            }
         }
     }
 }

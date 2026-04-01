@@ -11,7 +11,7 @@ import androidx.compose.material.icons.filled.Build
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import androidx.compose.ui.platform.LocalContext
@@ -26,11 +26,13 @@ import com.team2.studentfitness.ui.screens.DeveloperMenuScreen
 import com.team2.studentfitness.ui.screens.DetailScreen
 import com.team2.studentfitness.ui.screens.Dashboard
 import com.team2.studentfitness.ui.screens.LoginScreen
+import com.team2.studentfitness.ui.screens.OnboardingScreen
 import com.team2.studentfitness.ui.screens.SettingsScreen
 import com.team2.studentfitness.ui.theme.StudentFitnessTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.team2.studentfitness.viewmodels.LoginViewModel
+import com.team2.studentfitness.viewmodels.OnboardingViewModel
 import com.team2.studentfitness.viewmodels.SecurePinManager
 
 class MainActivity : ComponentActivity() {
@@ -44,19 +46,36 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            StudentFitnessTheme {
+            val context = LocalContext.current
+            val database = (application as DatabaseCreation).database
+            val settingsDao = database.settingsDao()
+            
+            var isDarkMode by remember { mutableStateOf(false) }
+            
+            LaunchedEffect(Unit) {
+                settingsDao.getAll().lastOrNull()?.let {
+                    isDarkMode = it.theme == 1
+                }
+            }
+
+            StudentFitnessTheme(darkTheme = isDarkMode) {
                 val navController = rememberNavController()
                 val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route
-                val context = LocalContext.current
 
-                // For now, initializing manually. In a real app, use Hilt or Koin.
-                val loginViewModel = remember {
-                    LoginViewModel(SecurePinManager(context))
+                val securePinManager = remember { SecurePinManager(context) }
+                val loginViewModel = remember { LoginViewModel(securePinManager) }
+                val onboardingViewModel = remember { OnboardingViewModel(application, securePinManager) }
+
+                val startDestination = if (onboardingViewModel.isOnboardingCompleted()) {
+                    if (securePinManager.isPinSet()) AppRoutes.Login else AppRoutes.Dashboard
+                } else {
+                    AppRoutes.Onboarding
                 }
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     floatingActionButton = {
+                        // Keep dev menu available everywhere for developers
                         if (currentDestination != AppRoutes.DeveloperMenu) {
                             FloatingActionButton(onClick = { navController.navigate(AppRoutes.DeveloperMenu) }) {
                                 Icon(imageVector = Icons.Default.Build, contentDescription = "Open developer menu")
@@ -66,9 +85,20 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     NavHost(
                         navController = navController,
-                        startDestination = AppRoutes.Login,
+                        startDestination = startDestination,
                         modifier = Modifier.padding(innerPadding)
                     ) {
+                        composable(AppRoutes.Onboarding) {
+                            OnboardingScreen(
+                                viewModel = onboardingViewModel,
+                                onOnboardingComplete = {
+                                    val nextDest = if (securePinManager.isPinSet()) AppRoutes.Login else AppRoutes.Dashboard
+                                    navController.navigate(nextDest) {
+                                        popUpTo(AppRoutes.Onboarding) { inclusive = true }
+                                    }
+                                }
+                            )
+                        }
                         composable(AppRoutes.Login) {
                             LoginScreen(
                                 viewModel = loginViewModel,
@@ -89,10 +119,12 @@ class MainActivity : ComponentActivity() {
                         composable(AppRoutes.Settings) {
                             SettingsScreen(
                                 onLogout = {
-                                    navController.navigate(AppRoutes.Login) {
+                                    val nextDest = if (securePinManager.isPinSet()) AppRoutes.Login else AppRoutes.Dashboard
+                                    navController.navigate(nextDest) {
                                         popUpTo(AppRoutes.Dashboard) { inclusive = true }
                                     }
-                                }
+                                },
+                                onThemeChanged = { isDarkMode = it }
                             )
                         }
                         composable(

@@ -4,15 +4,7 @@ import com.team2.studentfitness.database.UserDatabase
 
 
 class LoginViewModel(private val pinManager: SecurePinManager){
-    //This is currently unused until we implement accounts, if we do so.
-    fun login(username: String, password: String): Boolean {
-        //TODO: Implement actual login logic, this is just a placeholder
-        if (username == "user" && password == "password") {
-            return true
-        }
-        return false
-    }
-
+    // Login is now handled via PIN
     fun pinUnlock(pin: Int): Boolean {
         return pinManager.verifyPin(pin)
     }
