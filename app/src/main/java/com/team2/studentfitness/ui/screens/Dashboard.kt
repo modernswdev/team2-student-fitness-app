@@ -1,14 +1,17 @@
 package com.team2.studentfitness.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.MonitorWeight
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.Settings
@@ -35,7 +38,9 @@ import com.team2.studentfitness.ui.navigation.AppRoutes
 import com.team2.studentfitness.ui.theme.*
 import com.team2.studentfitness.viewmodels.HealthCalculations
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 @Composable
@@ -57,6 +62,8 @@ fun Dashboard(navController: NavController) {
     // Mental Health State
     var selectedMood by remember { mutableStateOf("") }
     var reflectionText by remember { mutableStateOf("") }
+    var mentalHealthLogs by remember { mutableStateOf<List<MentalHealth>>(emptyList()) }
+    var showLogs by remember { mutableStateOf(false) }
 
     val greeting = when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
         in 0..11 -> "Good Morning,"
@@ -71,10 +78,14 @@ fun Dashboard(navController: NavController) {
                 userName = it.name
             }
             latestHealthData = healthDao.getLatest()
+            mentalHealthLogs = mentalHealthDao.getAll()
         } catch (_: Exception) {
             // Suppress unused exception warning
         }
     }
+
+    val isDark = userSettings?.theme == 1
+    val textColor = if (isDark) Color.White else Color.Black
 
     Box(
         modifier = Modifier
@@ -92,7 +103,6 @@ fun Dashboard(navController: NavController) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top
             ) {
-                val textColor = if (userSettings?.theme == 1) Color.White else Color.Black
                 Column {
                     Text(
                         text = greeting,
@@ -131,18 +141,20 @@ fun Dashboard(navController: NavController) {
                     .fillMaxWidth()
                     .height(56.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(if (userSettings?.theme == 1) Color.DarkGray else Color.White),
+                    .background(if (isDark) Color.DarkGray else Color.White),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TabButton(
                     text = "Workout",
                     isSelected = selectedTab == "Workout",
+                    isDark = isDark,
                     modifier = Modifier.weight(1f),
                     onClick = { selectedTab = "Workout" }
                 )
                 TabButton(
                     text = "Mental Health",
                     isSelected = selectedTab == "Mental Health",
+                    isDark = isDark,
                     modifier = Modifier.weight(1f),
                     onClick = { selectedTab = "Mental Health" }
                 )
@@ -160,6 +172,9 @@ fun Dashboard(navController: NavController) {
                     reflectionText = reflectionText,
                     onReflectionChanged = { reflectionText = it },
                     userSettings = userSettings,
+                    logs = mentalHealthLogs,
+                    showLogs = showLogs,
+                    onToggleLogs = { showLogs = !showLogs },
                     onSave = {
                         scope.launch {
                             mentalHealthDao.insert(
@@ -167,6 +182,7 @@ fun Dashboard(navController: NavController) {
                             )
                             reflectionText = ""
                             selectedMood = ""
+                            mentalHealthLogs = mentalHealthDao.getAll()
                         }
                     }
                 )
@@ -176,7 +192,7 @@ fun Dashboard(navController: NavController) {
 }
 
 @Composable
-fun TabButton(text: String, isSelected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun TabButton(text: String, isSelected: Boolean, isDark: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Box(
         modifier = modifier
             .fillMaxHeight()
@@ -188,7 +204,7 @@ fun TabButton(text: String, isSelected: Boolean, modifier: Modifier = Modifier, 
     ) {
         Text(
             text = text,
-            color = if (isSelected) Color.White else (if (isSystemInDarkTheme()) Color.White else Color.Black),
+            color = if (isSelected) Color.White else (if (isDark) Color.White else Color.Black),
             fontWeight = FontWeight.Bold
         )
     }
@@ -434,13 +450,20 @@ fun MentalHealthTabContent(
     reflectionText: String,
     onReflectionChanged: (String) -> Unit,
     userSettings: UserSettings?,
+    logs: List<MentalHealth>,
+    showLogs: Boolean,
+    onToggleLogs: () -> Unit,
     onSave: () -> Unit
 ) {
     val isDark = userSettings?.theme == 1
     val textColor = if (isDark) Color.White else Color.Black
     val cardBg = if (isDark) Color(0xFF1E1E1E) else Color(0xFFFAF3F3)
 
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+    ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(24.dp),
@@ -512,12 +535,77 @@ fun MentalHealthTabContent(
                 Button(
                     onClick = onSave,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB099FF)),
+                    colors = ButtonDefaults.buttonColors(containerColor = if (isDark) Teal else Color(0xFFB099FF)),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text("Save Note", color = Color.White, fontWeight = FontWeight.Bold)
                 }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                TextButton(
+                    onClick = onToggleLogs,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.History,
+                            contentDescription = null,
+                            tint = if (isDark) Teal else Color(0xFFB099FF)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = if (showLogs) "Hide Logs" else "Show Logs",
+                            color = if (isDark) Teal else Color(0xFFB099FF),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
+        }
+
+        AnimatedVisibility(visible = showLogs) {
+            Column(modifier = Modifier.padding(top = 16.dp)) {
+                logs.forEach { log ->
+                    JournalEntryItem(log, cardBg, textColor)
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@Composable
+fun JournalEntryItem(log: MentalHealth, cardBg: Color, textColor: Color) {
+    val dateFormat = SimpleDateFormat("MMM dd, yyyy - hh:mm a", Locale.getDefault())
+    val dateString = dateFormat.format(Date(log.timestamp))
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = cardBg)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = log.mood, fontSize = 24.sp)
+                Text(
+                    text = dateString,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = textColor.copy(alpha = 0.6f)
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = log.reflection,
+                style = MaterialTheme.typography.bodyMedium,
+                color = textColor
+            )
         }
     }
 }
