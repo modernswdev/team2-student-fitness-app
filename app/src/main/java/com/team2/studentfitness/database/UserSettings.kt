@@ -13,7 +13,7 @@ data class UserSettings (
     val name: String,
     @ColumnInfo(name = "notifsOn")
     val notifsOn: Boolean,
-    @ColumnInfo(name = "theme", defaultValue = "1")
+    @ColumnInfo(name = "theme", defaultValue = "0")
     val theme: Int,
     @ColumnInfo(name = "homeGym")
     val homeGym: Int,

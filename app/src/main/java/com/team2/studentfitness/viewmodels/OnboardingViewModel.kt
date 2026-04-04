@@ -52,12 +52,12 @@ class OnboardingViewModel(application: Application, private val securePinManager
             )
             appDatabase.healthDao().insert(healthData)
 
-            // 3. Store User Settings
+            // 3. Store User Settings - Default theme to 0 (Light Mode)
             val userSettings = UserSettings(
                 uid = uid,
                 name = name,
                 notifsOn = true,
-                theme = 1,
+                theme = 0,
                 homeGym = 0,
                 loginCount = 1,
                 isMetric = isMetric,

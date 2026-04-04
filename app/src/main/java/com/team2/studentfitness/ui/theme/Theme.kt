@@ -22,16 +22,22 @@ private val DarkColorScheme = darkColorScheme(
     tertiary = Mint,
     background = Color.Black,
     surface = Color(0xFF121212),
+    surfaceVariant = Color(0xFF1E1E1E), // Dark card color
+    onSurfaceVariant = Color.White,
     onPrimary = Color.White,
-    onSecondary = Color.White
+    onSecondary = Color.White,
+    onBackground = Color.White,
+    onSurface = Color.White
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Teal,
     secondary = Orange,
     tertiary = Mint,
-    background = Teal, // Restore original teal background for light mode
+    background = Teal, // Original teal background
     surface = Color.White,
+    surfaceVariant = Color(0xFFFAF3F3), // Light creamy card color
+    onSurfaceVariant = Color.Black,
     onPrimary = Color.White,
     onSecondary = Color.Black,
     onBackground = Color.Black,
@@ -60,7 +66,7 @@ fun StudentFitnessTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 

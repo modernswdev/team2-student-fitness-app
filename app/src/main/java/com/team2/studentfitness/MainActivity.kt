@@ -50,13 +50,9 @@ class MainActivity : ComponentActivity() {
             val database = (application as DatabaseCreation).database
             val settingsDao = database.settingsDao()
             
-            var isDarkMode by remember { mutableStateOf(false) }
-            
-            LaunchedEffect(Unit) {
-                settingsDao.getAll().lastOrNull()?.let {
-                    isDarkMode = it.theme == 1
-                }
-            }
+            // Use Flow to observe theme changes in real-time across the app
+            val latestSettings by settingsDao.getLatestFlow().collectAsState(initial = null)
+            val isDarkMode = latestSettings?.theme == 1
 
             StudentFitnessTheme(darkTheme = isDarkMode) {
                 val navController = rememberNavController()
@@ -123,8 +119,7 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate(nextDest) {
                                         popUpTo(AppRoutes.Dashboard) { inclusive = true }
                                     }
-                                },
-                                onThemeChanged = { isDarkMode = it }
+                                }
                             )
                         }
                         composable(
