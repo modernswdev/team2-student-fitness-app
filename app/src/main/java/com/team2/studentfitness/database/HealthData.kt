@@ -9,6 +9,8 @@ import androidx.room.PrimaryKey
 data class HealthData (
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    @ColumnInfo(name = "uid")
+    val uid: Int = 0,
     @ColumnInfo(name = "timestamp", defaultValue = "CURRENT_TIMESTAMP")
     val timestamp: String? = null,
     @ColumnInfo(name = "heartRate")

@@ -13,10 +13,10 @@ interface MentalHealthDao {
     @Query("SELECT * FROM MentalHealth WHERE id = :id")
     suspend fun getById(id: Int): MentalHealth?
 
-    @Insert()
+    @Insert
     suspend fun insert(mentalHealth: MentalHealth)
 
-    @Delete()
+    @Delete
     suspend fun delete(mentalHealth: MentalHealth)
 
     //Get most recent entry
@@ -25,10 +25,10 @@ interface MentalHealthDao {
 
     //Get all data from timestamp
     @Query("SELECT * FROM MentalHealth WHERE timestamp = :timestamp")
-    suspend fun getByTimestamp(timestamp: Long): MentalHealth?
+    suspend fun getByTimestamp(timestamp: Long): List<MentalHealth>
 
     //Get ID from timestamp
-    @Query("SELECT id FROM MentalHealth WHERE timestamp = :timestamp")
+    @Query("SELECT id FROM MentalHealth WHERE timestamp = :timestamp ORDER BY id DESC LIMIT 1")
     suspend fun getIdByTimestamp(timestamp: Long): Int?
 
     //Change mood at id
