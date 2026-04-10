@@ -38,7 +38,6 @@ fun LoginScreen(
     val isDark = isSystemInDarkTheme()
     val bgColor = MaterialTheme.colorScheme.background
     val accentColor = MaterialTheme.colorScheme.secondary
-    val textColor = if (isDark) Color.White else Color.Black
     val secondaryTextColor = if (isDark) Color.LightGray else Color.White // Original subtitle was white on teal
 
     Box(
