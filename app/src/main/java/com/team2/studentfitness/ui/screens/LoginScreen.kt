@@ -38,7 +38,6 @@ fun LoginScreen(
     val isDark = isSystemInDarkTheme()
     val bgColor = MaterialTheme.colorScheme.background
     val accentColor = MaterialTheme.colorScheme.secondary
-    val textColor = if (isDark) Color.White else Color.Black
 
     Box(
         modifier = modifier
