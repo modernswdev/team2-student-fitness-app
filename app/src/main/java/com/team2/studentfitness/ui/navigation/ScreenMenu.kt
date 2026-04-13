@@ -11,8 +11,11 @@ object AppRoutes {
     const val Dashboard = "dashboard"
     const val Settings = "settings"
     const val DeveloperMenu = "dev-menu"
+    const val Workouts = "workouts"
+    const val ExerciseListTemplate = "exercises/{workoutId}/{workoutName}"
     const val DetailTemplate = "detail/{feature}"
 
+    fun exercises(workoutId: Int, workoutName: String): String = "exercises/$workoutId/$workoutName"
     fun detail(feature: String): String = "detail/$feature"
 }
 
@@ -22,6 +25,7 @@ val ScreenMenu = listOf(
     ScreenMenuItem(title = "Onboarding", route = AppRoutes.Onboarding),
     ScreenMenuItem(title = "Dashboard", route = AppRoutes.Dashboard),
     ScreenMenuItem(title = "Settings", route = AppRoutes.Settings),
+    ScreenMenuItem(title = "Workouts", route = AppRoutes.Workouts),
     ScreenMenuItem(title = "Detail: Heart Rate", route = AppRoutes.detail("Heart Rate")),
     ScreenMenuItem(title = "Detail: Calories", route = AppRoutes.detail("Calories")),
     ScreenMenuItem(title = "Detail: Gym Hours", route = AppRoutes.detail("Gym Hours")),
