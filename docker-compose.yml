@@ -1,0 +1,17 @@
+services:
+  build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Mount a local output directory so the APK is accessible on the host
+    volumes:
+      - ./app/build/outputs:/app/app/build/outputs
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Override the build step to run unit tests instead
+    command: ["./gradlew", "test", "--no-daemon"]
+    volumes:
+      - ./app/build/reports:/app/app/build/reports
