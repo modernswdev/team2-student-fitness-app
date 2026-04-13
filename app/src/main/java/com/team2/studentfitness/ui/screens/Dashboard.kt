@@ -1,6 +1,9 @@
 package com.team2.studentfitness.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -37,6 +40,7 @@ import com.team2.studentfitness.database.UserSettings
 import com.team2.studentfitness.ui.navigation.AppRoutes
 import com.team2.studentfitness.ui.theme.*
 import com.team2.studentfitness.viewmodels.HealthCalculations
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -444,6 +448,138 @@ fun StatCard(
 }
 
 @Composable
+fun BreathingSection(userSettings: UserSettings?) {
+    val isDark = userSettings?.theme == 1
+    val cardBg = if (isDark) Color(0xFF1E1E1E) else Color(0xFFFAF3F3)
+    val textColor = if (isDark) Color.White else Color.Black
+    val accentColor = if (isDark) Teal else Color(0xFFB099FF)
+
+    var isRunning by remember { mutableStateOf(false) }
+    var phase by remember { mutableStateOf("Ready") }
+    var timeLeft by remember { mutableIntStateOf(4) }
+
+    val animationProgress by animateFloatAsState(
+        targetValue = when (phase) {
+            "Inhale" -> 1f
+            "Hold " -> 1f // Space added to distinguish from second hold if needed
+            "Exhale" -> 0.3f
+            "Hold" -> 0.3f
+            else -> 0.3f
+        },
+        animationSpec = tween(durationMillis = 4000, easing = LinearEasing),
+        label = "BreathingAnimation"
+    )
+
+    LaunchedEffect(isRunning) {
+        if (isRunning) {
+            while (isRunning) {
+                phase = "Inhale"
+                for (i in 4 downTo 1) {
+                    timeLeft = i
+                    delay(1000)
+                }
+                phase = "Hold "
+                for (i in 4 downTo 1) {
+                    timeLeft = i
+                    delay(1000)
+                }
+                phase = "Exhale"
+                for (i in 4 downTo 1) {
+                    timeLeft = i
+                    delay(1000)
+                }
+                phase = "Hold"
+                for (i in 4 downTo 1) {
+                    timeLeft = i
+                    delay(1000)
+                }
+            }
+        } else {
+            phase = "Ready"
+            timeLeft = 4
+        }
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = cardBg)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Guided Breathing",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = textColor
+            )
+            Text(
+                text = "Box breathing helps reduce stress",
+                style = MaterialTheme.typography.bodyMedium,
+                color = textColor.copy(alpha = 0.7f)
+            )
+            
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.size(160.dp)
+            ) {
+                // Animated Circle
+                Box(
+                    modifier = Modifier
+                        .size(140.dp * animationProgress)
+                        .clip(CircleShape)
+                        .background(accentColor.copy(alpha = 0.2f))
+                )
+                
+                // Static outer border
+                Box(
+                    modifier = Modifier
+                        .size(140.dp)
+                        .clip(CircleShape)
+                        .background(accentColor.copy(alpha = 0.1f))
+                )
+
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = phase.trim(),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = textColor
+                    )
+                    if (isRunning) {
+                        Text(
+                            text = timeLeft.toString(),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = textColor.copy(alpha = 0.8f)
+                        )
+                    }
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            Button(
+                onClick = { isRunning = !isRunning },
+                colors = ButtonDefaults.buttonColors(containerColor = accentColor),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = if (isRunning) "Stop" else "Start Exercise", 
+                    color = Color.White, 
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun MentalHealthTabContent(
     selectedMood: String,
     onMoodSelected: (String) -> Unit,
@@ -498,6 +634,10 @@ fun MentalHealthTabContent(
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        BreathingSection(userSettings)
 
         Spacer(modifier = Modifier.height(24.dp))
 
