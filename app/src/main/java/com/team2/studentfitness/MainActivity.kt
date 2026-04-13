@@ -28,6 +28,8 @@ import com.team2.studentfitness.ui.screens.Dashboard
 import com.team2.studentfitness.ui.screens.LoginScreen
 import com.team2.studentfitness.ui.screens.OnboardingScreen
 import com.team2.studentfitness.ui.screens.SettingsScreen
+import com.team2.studentfitness.ui.screens.WorkoutScreen
+import com.team2.studentfitness.ui.screens.ExerciseListScreen
 import com.team2.studentfitness.ui.theme.StudentFitnessTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -120,6 +122,24 @@ class MainActivity : ComponentActivity() {
                                         popUpTo(AppRoutes.Dashboard) { inclusive = true }
                                     }
                                 }
+                            )
+                        }
+                        composable(AppRoutes.Workouts) {
+                            WorkoutScreen(navController = navController)
+                        }
+                        composable(
+                            route = AppRoutes.ExerciseListTemplate,
+                            arguments = listOf(
+                                navArgument("workoutId") { type = NavType.IntType },
+                                navArgument("workoutName") { type = NavType.StringType }
+                            )
+                        ) { backStackEntry ->
+                            val workoutId = backStackEntry.arguments?.getInt("workoutId") ?: 0
+                            val workoutName = backStackEntry.arguments?.getString("workoutName") ?: "Exercises"
+                            ExerciseListScreen(
+                                navController = navController,
+                                workoutId = workoutId,
+                                workoutName = workoutName
                             )
                         }
                         composable(

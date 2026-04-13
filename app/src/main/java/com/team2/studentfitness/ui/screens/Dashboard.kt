@@ -353,7 +353,7 @@ fun WorkoutTabContent(navController: NavController, healthData: HealthData?, use
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
-                        onClick = { navController.navigate(AppRoutes.detail("Workouts")) },
+                        onClick = { navController.navigate(AppRoutes.Workouts) },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                         shape = RoundedCornerShape(8.dp),
                         contentPadding = PaddingValues(horizontal = 24.dp)
