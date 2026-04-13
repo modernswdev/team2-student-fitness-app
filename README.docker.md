@@ -6,17 +6,56 @@ This document explains how to build, test, and run the Android app using Docker,
 
 - [Docker](https://docs.docker.com/get-docker/) (v20+)
 - [Docker Compose](https://docs.docker.com/compose/install/) (v2+)
-- **KVM** enabled on your host (required by the emulator service — Linux hosts only; see note below)
+- **KVM** enabled on your host (required by the emulator service)
 
-### KVM availability check
+### Linux
 
 ```bash
-# Linux: verify KVM is available
+# Verify KVM is available
 sudo apt install cpu-checker
 kvm-ok
 ```
 
-> **macOS / Windows users:** The Android emulator requires KVM (Linux kernel virtualisation). Run it inside a Linux VM or use a cloud/CI environment that exposes `/dev/kvm`.
+### Windows 10 / 11 — Docker Desktop + WSL2 (no manual Linux VM needed)
+
+Docker Desktop for Windows manages WSL2 automatically, so you do **not** need to set up a Linux VM by hand. Follow these steps once:
+
+1. **Enable WSL2 and install Docker Desktop**
+   - Open PowerShell as Administrator and run:
+     ```powershell
+     wsl --install
+     ```
+   - Restart your PC, then [download and install Docker Desktop](https://www.docker.com/products/docker-desktop/).
+   - In Docker Desktop → Settings → General, make sure **"Use the WSL 2 based engine"** is checked.
+
+2. **Enable nested virtualisation** (lets WSL2 run KVM for the Android emulator)
+   - Open Notepad and create/edit the file `%USERPROFILE%\.wslconfig` with these contents:
+     ```ini
+     [wsl2]
+     nestedVirtualization=true
+     ```
+   - Restart WSL2:
+     ```powershell
+     wsl --shutdown
+     ```
+
+3. **Add your WSL2 user to the `kvm` group** (run this inside a WSL2 terminal)
+   ```bash
+   sudo apt update && sudo apt install -y qemu-kvm
+   sudo usermod -aG kvm "$USER"
+   # Close and reopen the WSL2 terminal for the group change to take effect
+   ```
+
+4. **Verify KVM is available inside WSL2**
+   ```bash
+   sudo apt install -y cpu-checker
+   kvm-ok
+   # Expected: "KVM acceleration can be used"
+   ```
+
+After completing these steps, all `docker compose` commands in this guide work on Windows exactly as written — Docker Desktop transparently routes them through WSL2.
+
+> **macOS users:** The Android emulator requires KVM, which is Linux-only. Use a Linux VM or a cloud/CI environment that exposes `/dev/kvm`.
 
 ---
 
