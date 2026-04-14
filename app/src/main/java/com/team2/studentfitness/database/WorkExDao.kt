@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Insert
 import androidx.room.Delete
+import androidx.room.Transaction
 
 @Dao
 interface WorkExDao {
@@ -19,6 +20,9 @@ interface WorkExDao {
 
     @Insert()
     suspend fun insert(workouts: WorkEx)
+
+    @Insert()
+    suspend fun insertAll(workExList: List<WorkEx>)
 
     @Delete()
     suspend fun delete(workouts: WorkEx)
@@ -42,4 +46,21 @@ interface WorkExDao {
     //Edit order
     @Query("UPDATE WorkEx SET exOrder = :exOrder WHERE uid = :uid")
     suspend fun editOrder(uid: Int, exOrder: Int)
+
+    @Transaction
+    suspend fun insertOrderedWorkEx(inputs: List<WorkExInput>) {
+        val workExList = inputs.mapIndexed { index, input ->
+            WorkEx(
+                uid = 0,
+                workoutName = input.workoutName,
+                workoutID = input.workoutID,
+                exerciseID = input.exerciseID,
+                reps = input.reps,
+                sets = input.sets,
+                restTime = input.restTime,
+                order = index + 1
+            )
+        }
+        insertAll(workExList)
+    }
 }

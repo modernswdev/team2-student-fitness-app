@@ -43,19 +43,18 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
             
             // Find all WorkEx that use these exercises
             val allWorkEx = workExDao.getAll()
-            val workoutIds = allWorkEx.filter { it.exerciseID in exerciseIds }.map { it.userID }.toSet()
+            val workoutIds = allWorkEx.filter { it.exerciseID in exerciseIds }.map { it.workoutID }.toSet()
             
             // Get the actual workouts
             val allWorkouts = workoutsDao.getAll()
-            _workouts.value = allWorkouts.filter { it.uid in workoutIds }
+            _workouts.value = allWorkouts.filter { it.workoutID in workoutIds }
             _isLoading.value = false
         }
     }
 
     fun loadExercisesForWorkout(workout: Workouts) {
         viewModelScope.launch {
-            // In WorkEx, workoutID is stored in the 'userID' field based on the Entity definition
-            val workExList = workExDao.getAll().filter { it.userID == workout.uid }.sortedBy { it.order }
+            val workExList = workExDao.getAll().filter { it.workoutID == workout.workoutID }.sortedBy { it.order }
             val pairs = workExList.mapNotNull { workEx ->
                 val exercise = exercisesDao.getById(workEx.exerciseID)
                 if (exercise != null) workEx to exercise else null

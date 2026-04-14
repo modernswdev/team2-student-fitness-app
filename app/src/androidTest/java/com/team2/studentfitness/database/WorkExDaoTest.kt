@@ -27,6 +27,7 @@ class WorkExDaoTest {
         db = Room.inMemoryDatabaseBuilder(
             context, Database::class.java
         ).addCallback(Database.getDatabaseCallback(context))
+         .fallbackToDestructiveMigration(true)
          .build()
         
         workExDao = db.workExDao()
@@ -44,6 +45,54 @@ class WorkExDaoTest {
     }
 
     @Test
+    fun insertOrderedWorkExTest() = runTest {
+        val workoutID = 2000
+        val workoutName = "Test"
+        
+        val inputs = listOf(
+            WorkExInput(
+                workoutName = workoutName,
+                workoutID = workoutID,
+                exerciseID = 1,
+                reps = 1,
+                sets = 2,
+                restTime = 40
+            ),
+            WorkExInput(
+                workoutName = workoutName,
+                workoutID = workoutID,
+                exerciseID = 2,
+                reps = 3,
+                sets = 3,
+                restTime = 10
+            )
+        )
+        
+        workExDao.insertOrderedWorkEx(inputs)
+        
+        val results = workExDao.getByName(workoutName)
+        assertEquals(2, results.size)
+        
+        // Verify first exercise
+        val first = results.find { it.order == 1 }
+        assertNotNull(first)
+        assertEquals(workoutID, first?.workoutID)
+        assertEquals(1, first?.exerciseID)
+        assertEquals(1, first?.reps)
+        assertEquals(2, first?.sets)
+        assertEquals(40, first?.restTime)
+        
+        // Verify second exercise
+        val second = results.find { it.order == 2 }
+        assertNotNull(second)
+        assertEquals(workoutID, second?.workoutID)
+        assertEquals(2, second?.exerciseID)
+        assertEquals(3, second?.reps)
+        assertEquals(3, second?.sets)
+        assertEquals(10, second?.restTime)
+    }
+
+    @Test
     fun checkPrepopulatedData() = runTest {
         val allWorkEx = workExDao.getAll()
         
@@ -55,7 +104,7 @@ class WorkExDaoTest {
         assertTrue(w001Records.isNotEmpty())
         val first = w001Records.find { it.order == 1 }
         assertNotNull(first)
-        assertEquals(1, first?.userID) // W001 -> 1
+        assertEquals(1, first?.workoutID) // W001 -> 1
         assertEquals(1, first?.exerciseID) // E001 -> 1
         assertEquals(4, first?.sets)
         assertEquals(6, first?.reps) // "6-8" parsed as 6
@@ -65,9 +114,9 @@ class WorkExDaoTest {
     @Test
     fun insertAndGetAllWorkEx() = runTest {
         val workEx = WorkEx(
-            uid = 1000,
+            uid = 0,
+            workoutID = 1000,
             workoutName = "Custom",
-            userID = 100,
             exerciseID = 200,
             reps = 10,
             sets = 3,
@@ -77,7 +126,7 @@ class WorkExDaoTest {
         workExDao.insert(workEx)
         val result = workExDao.getByName("Custom")
         assertEquals(1, result.size)
-        assertEquals(100, result[0].userID)
+        assertEquals(1000, result[0].workoutID)
     }
 
     @Test

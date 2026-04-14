@@ -92,12 +92,16 @@ public abstract class Database : RoomDatabase() {
                     while (line != null) {
                         val parts = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)".toRegex())
                         if (parts.size >= 7) {
+                            val idStr = clean(parts[0]) // e.g. "W001"
                             val name = clean(parts[1])
                             val duration = clean(parts[2]).toIntOrNull() ?: 0
                             val focus = clean(parts[3])
                             val typeStr = clean(parts[4])
                             val difficultyStr = clean(parts[5])
                             val split = clean(parts[6])
+
+                            // Parse workoutID from W001 -> 1
+                            val workoutID = idStr.substring(1).toIntOrNull() ?: 0
 
                             val type = when (typeStr.lowercase()) {
                                 "recovery" -> 0
@@ -115,8 +119,8 @@ public abstract class Database : RoomDatabase() {
                             }
 
                             db.execSQL(
-                                "INSERT INTO Workouts (name, duration, focus, type, difficulty, split) VALUES (?, ?, ?, ?, ?, ?)",
-                                arrayOf<Any>(name, duration, focus, type, difficulty, split)
+                                "INSERT INTO Workouts (workoutID, workoutName, duration, focus, type, difficulty, split) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                                arrayOf<Any>(workoutID, name, duration, focus, type, difficulty, split)
                             )
                         }
                         line = r.readLine()

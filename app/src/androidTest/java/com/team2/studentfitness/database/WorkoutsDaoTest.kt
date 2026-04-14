@@ -27,6 +27,7 @@ class WorkoutsDaoTest {
         db = Room.inMemoryDatabaseBuilder(
             context, Database::class.java
         ).addCallback(Database.getDatabaseCallback(context))
+         .fallbackToDestructiveMigration(true)
          .build()
         
         workoutsDao = db.workoutsDao()
@@ -44,6 +45,15 @@ class WorkoutsDaoTest {
     }
 
     @Test
+    fun printFirstWorkout() = runTest {
+        val allWorkouts = workoutsDao.getAll()
+        if (allWorkouts.isNotEmpty()) {
+            val first = allWorkouts[0]
+            println("First Workout ID: ${first.workoutID}, Name: ${first.workoutName}")
+        }
+    }
+
+    @Test
     fun checkPrepopulatedData() = runTest {
         val allWorkouts = workoutsDao.getAll()
         
@@ -55,6 +65,7 @@ class WorkoutsDaoTest {
         val firstResult = workoutsDao.getByName("Push Strength")
         assertNotNull(firstResult)
         assertEquals(1, firstResult.size)
+        assertEquals(1, firstResult[0].workoutID)
         assertEquals(50, firstResult[0].duration)
         assertEquals(2, firstResult[0].type) // Strength = 2
         assertEquals(1, firstResult[0].difficulty) // Intermediate = 1
@@ -73,8 +84,8 @@ class WorkoutsDaoTest {
     @Test
     fun insertAndGetAllWorkouts() = runTest {
         val workout = Workouts(
-            uid = 1000, // High ID to avoid conflict with pre-populated data
-            name = "Custom Workout",
+            workoutID = 1000, // High ID to avoid conflict with pre-populated data
+            workoutName = "Custom Workout",
             duration = 30,
             focus = "Flexibility",
             type = 0,
@@ -84,7 +95,7 @@ class WorkoutsDaoTest {
         workoutsDao.insert(workout)
         val result = workoutsDao.getByName("Custom Workout")
         assertEquals(1, result.size)
-        assertEquals("Custom Workout", result[0].name)
+        assertEquals("Custom Workout", result[0].workoutName)
     }
 
     @Test
@@ -101,11 +112,11 @@ class WorkoutsDaoTest {
     fun getIndividualFields() = runTest {
         // W001 has duration 50
         val first = workoutsDao.getByName("Push Strength")[0]
-        val uid = first.uid
+        val id = first.workoutID
         
-        assertEquals(first.type, workoutsDao.getType(uid))
-        assertEquals(50, workoutsDao.getDuration(uid))
-        assertEquals("Push", workoutsDao.getSplit(uid))
+        assertEquals(first.type, workoutsDao.getType(id))
+        assertEquals(50, workoutsDao.getDuration(id))
+        assertEquals("Push", workoutsDao.getSplit(id))
     }
 
     @Test

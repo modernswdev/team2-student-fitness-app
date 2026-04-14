@@ -11,10 +11,10 @@ interface WorkoutsDao {
     @Query("SELECT * FROM Workouts")
     suspend fun getAll(): List<Workouts>
 
-    @Query("SELECT * FROM Workouts WHERE uid = :uid")
-    suspend fun getById(uid: Int): Workouts
+    @Query("SELECT * FROM Workouts WHERE workoutID = :workoutID")
+    suspend fun getById(workoutID: Int): Workouts
 
-    @Query("SELECT * FROM Workouts WHERE name = :name")
+    @Query("SELECT * FROM Workouts WHERE workoutName = :name")
     suspend fun getByName(name: String): List<Workouts>
 
     @Insert()
@@ -23,8 +23,8 @@ interface WorkoutsDao {
     @Delete()
     suspend fun delete(workouts: Workouts)
 
-    @Query("DELETE FROM Workouts WHERE uid = :uid")
-    suspend fun deleteById(uid: Int)
+    @Query("DELETE FROM Workouts WHERE workoutID = :workoutID")
+    suspend fun deleteById(workoutID: Int)
 
     // ----- Select all -----
     //Select all by type
@@ -49,22 +49,22 @@ interface WorkoutsDao {
 
     // ----- Select by ID -----
     //Get type by ID
-    @Query("SELECT type FROM Workouts WHERE uid = :uid")
-    suspend fun getType(uid: Int): Int
+    @Query("SELECT type FROM Workouts WHERE workoutID = :workoutID")
+    suspend fun getType(workoutID: Int): Int
 
     //Get duration by ID
-    @Query("SELECT duration FROM Workouts WHERE uid = :uid")
-    suspend fun getDuration(uid: Int): Int
+    @Query("SELECT duration FROM Workouts WHERE workoutID = :workoutID")
+    suspend fun getDuration(workoutID: Int): Int
 
     //Get focus by ID
-    @Query("SELECT focus FROM Workouts WHERE uid = :uid")
-    suspend fun getFocus(uid: Int): String
+    @Query("SELECT focus FROM Workouts WHERE workoutID = :workoutID")
+    suspend fun getFocus(workoutID: Int): String
 
     //Get difficulty by ID
-    @Query("SELECT difficulty FROM Workouts WHERE uid = :uid")
-    suspend fun getDifficulty(uid: Int): Int
+    @Query("SELECT difficulty FROM Workouts WHERE workoutID = :workoutID")
+    suspend fun getDifficulty(workoutID: Int): Int
 
     //Get split by ID
-    @Query("SELECT split FROM Workouts WHERE uid = :uid")
-    suspend fun getSplit(uid: Int): String
+    @Query("SELECT split FROM Workouts WHERE workoutID = :workoutID")
+    suspend fun getSplit(workoutID: Int): String
 }

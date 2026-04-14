@@ -133,7 +133,7 @@ fun WorkoutScreen(navController: NavController, workoutViewModel: WorkoutViewMod
             ) {
                 items(workouts) { workout ->
                     WorkoutItem(workout, cardBackground, textColor) {
-                        navController.navigate(AppRoutes.exercises(workout.uid, workout.name))
+                        navController.navigate(AppRoutes.exercises(workout.workoutID, workout.workoutName))
                     }
                 }
             }
@@ -217,7 +217,7 @@ fun WorkoutItem(workout: Workouts, backgroundColor: Color, textColor: Color, onC
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
-                Text(workout.name, fontWeight = FontWeight.Bold, color = textColor)
+                Text(workout.workoutName, fontWeight = FontWeight.Bold, color = textColor)
                 Text("${workout.duration} min • ${workout.focus}", style = MaterialTheme.typography.bodySmall, color = textColor.copy(alpha = 0.7f))
             }
             Icon(

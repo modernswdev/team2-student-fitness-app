@@ -4,13 +4,13 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-//This table shows all exercises
+//This table shows all workouts
 @Entity
 data class Workouts (
-    @PrimaryKey(autoGenerate = true)
-    val uid: Int,
-    @ColumnInfo(name = "name")
-    val name: String,
+    @PrimaryKey(autoGenerate = false)
+    val workoutID: Int,
+    @ColumnInfo(name = "workoutName")
+    val workoutName: String,
     @ColumnInfo(name = "duration")
     val duration: Int,
     @ColumnInfo(name = "focus")
@@ -22,4 +22,3 @@ data class Workouts (
     @ColumnInfo(name = "split")
     val split: String
 )
-

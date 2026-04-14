@@ -12,7 +12,7 @@ data class WorkEx (
     @ColumnInfo(name = "workoutName")
     val workoutName: String,
     @ColumnInfo(name = "workoutID")
-    val userID: Int,
+    val workoutID: Int,
     @ColumnInfo(name = "exerciseID")
     val exerciseID: Int,
     @ColumnInfo(name = "reps")
@@ -25,3 +25,11 @@ data class WorkEx (
     val order: Int
     )
 
+data class WorkExInput(
+    val workoutName: String,
+    val workoutID: Int,
+    val exerciseID: Int,
+    val reps: Int,
+    val sets: Int,
+    val restTime: Int
+)
