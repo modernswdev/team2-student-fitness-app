@@ -28,6 +28,7 @@ import com.team2.studentfitness.ui.screens.Dashboard
 import com.team2.studentfitness.ui.screens.LoginScreen
 import com.team2.studentfitness.ui.screens.OnboardingScreen
 import com.team2.studentfitness.ui.screens.SettingsScreen
+import com.team2.studentfitness.ui.screens.VideoDemoScreen
 import com.team2.studentfitness.ui.theme.StudentFitnessTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -121,6 +122,9 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             )
+                        }
+                        composable(AppRoutes.VideoDemo) {
+                            VideoDemoScreen()
                         }
                         composable(
                             route = AppRoutes.DetailTemplate,

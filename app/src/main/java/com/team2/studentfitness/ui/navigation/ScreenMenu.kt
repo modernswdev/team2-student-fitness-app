@@ -12,6 +12,7 @@ object AppRoutes {
     const val Settings = "settings"
     const val DeveloperMenu = "dev-menu"
     const val DetailTemplate = "detail/{feature}"
+    const val VideoDemo = "video-demo"
 
     fun detail(feature: String): String = "detail/$feature"
 }
@@ -22,6 +23,7 @@ val ScreenMenu = listOf(
     ScreenMenuItem(title = "Onboarding", route = AppRoutes.Onboarding),
     ScreenMenuItem(title = "Dashboard", route = AppRoutes.Dashboard),
     ScreenMenuItem(title = "Settings", route = AppRoutes.Settings),
+    ScreenMenuItem(title = "Video Demo", route = AppRoutes.VideoDemo),
     ScreenMenuItem(title = "Detail: Heart Rate", route = AppRoutes.detail("Heart Rate")),
     ScreenMenuItem(title = "Detail: Calories", route = AppRoutes.detail("Calories")),
     ScreenMenuItem(title = "Detail: Gym Hours", route = AppRoutes.detail("Gym Hours")),
