@@ -27,6 +27,7 @@ import com.team2.studentfitness.ui.screens.DetailScreen
 import com.team2.studentfitness.ui.screens.Dashboard
 import com.team2.studentfitness.ui.screens.LoginScreen
 import com.team2.studentfitness.ui.screens.OnboardingScreen
+import com.team2.studentfitness.ui.screens.OfficialYouTubeDemoScreen
 import com.team2.studentfitness.ui.screens.SettingsScreen
 import com.team2.studentfitness.ui.screens.VideoDemoScreen
 import com.team2.studentfitness.ui.theme.StudentFitnessTheme
@@ -125,6 +126,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(AppRoutes.VideoDemo) {
                             VideoDemoScreen()
+                        }
+                        composable(AppRoutes.OfficialYouTubeDemo) {
+                            OfficialYouTubeDemoScreen()
                         }
                         composable(
                             route = AppRoutes.DetailTemplate,

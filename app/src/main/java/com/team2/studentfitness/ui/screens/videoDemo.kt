@@ -2,12 +2,7 @@ package com.team2.studentfitness.ui.screens
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.webkit.CookieManager
-import android.webkit.WebChromeClient
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -28,31 +23,39 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
-import android.view.ViewGroup
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.options.IFramePlayerOptions
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.utils.YouTubePlayerTracker
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun VideoDemoScreen(
-    videoId: String = "sHwvUFjaNdU"
+    videoId: String = "M7lc1UVf-VE"
 ) {
     val context = LocalContext.current
-    val webViewHolder = remember { mutableStateOf<WebView?>(null) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val playerViewHolder = remember { mutableStateOf<YouTubePlayerView?>(null) }
+    val playerHolder = remember { mutableStateOf<YouTubePlayer?>(null) }
+    val tracker = remember { YouTubePlayerTracker() }
     val embedFailed = remember { mutableStateOf(false) }
 
     DisposableEffect(Unit) {
         onDispose {
-            webViewHolder.value?.apply {
-                loadUrl("about:blank")
-                stopLoading()
-                destroy()
+            playerHolder.value = null
+            playerViewHolder.value?.let { view ->
+                lifecycleOwner.lifecycle.removeObserver(view)
+                view.release()
             }
-            webViewHolder.value = null
+            playerViewHolder.value = null
         }
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("YouTube Embed Test") }) }
+        topBar = { TopAppBar(title = { Text("YouTube IFrame API Demo") }) }
     ) { innerPadding ->
         if (embedFailed.value) {
             Column(
@@ -79,104 +82,46 @@ fun VideoDemoScreen(
                     .padding(innerPadding)
                     .aspectRatio(16f / 9f),
                 factory = { ctx ->
-                    WebView(ctx).apply {
-                        webViewHolder.value = this
+                    YouTubePlayerView(ctx).apply {
+                        playerViewHolder.value = this
+                        lifecycleOwner.lifecycle.addObserver(this)
                         layoutParams = ViewGroup.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT
                         )
-                        setBackgroundColor(android.graphics.Color.BLACK)
 
-                        CookieManager.getInstance().setAcceptCookie(true)
-                        CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
+                        val playerOptions = IFramePlayerOptions.Builder()
+                            .controls(1)
+                            .fullscreen(1)
+                            .rel(0)
+                            .ivLoadPolicy(3)
+                            .build()
 
-                        settings.javaScriptEnabled = true
-                        settings.domStorageEnabled = true
-                        settings.loadsImagesAutomatically = true
-                        settings.javaScriptCanOpenWindowsAutomatically = true
-                        settings.mediaPlaybackRequiresUserGesture = false
-                        settings.useWideViewPort = true
-                        settings.loadWithOverviewMode = true
-
-                        webViewClient = object : WebViewClient() {
-                            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean = false
-
-                            override fun onReceivedError(
-                                view: WebView?,
-                                request: WebResourceRequest?,
-                                error: WebResourceError?
-                            ) {
-                                if (request?.isForMainFrame == true) {
-                                    embedFailed.value = true
-                                }
+                        initialize(object : AbstractYouTubePlayerListener() {
+                            override fun onReady(youTubePlayer: YouTubePlayer) {
+                                playerHolder.value = youTubePlayer
+                                youTubePlayer.addListener(tracker)
+                                youTubePlayer.cueVideo(videoId, 0f)
                             }
-                        }
-                        webChromeClient = WebChromeClient()
 
-                        loadDataWithBaseURL(
-                            "https://www.youtube.com",
-                            buildYoutubeEmbedHtml(videoId),
-                            "text/html",
-                            "utf-8",
-                            null
-                        )
+                            override fun onError(
+                                youTubePlayer: YouTubePlayer,
+                                error: com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants.PlayerError
+                            ) {
+                                embedFailed.value = true
+                            }
+                        }, true, playerOptions)
                     }
                 },
-                update = { view ->
-                    if (view.url == null) {
-                        view.loadDataWithBaseURL(
-                            "https://www.youtube.com",
-                            buildYoutubeEmbedHtml(videoId),
-                            "text/html",
-                            "utf-8",
-                            null
-                        )
+                update = {
+                    playerHolder.value?.let { player ->
+                        if (tracker.videoId != videoId) {
+                            embedFailed.value = false
+                            player.cueVideo(videoId, 0f)
+                        }
                     }
                 }
             )
         }
     }
 }
-
-private fun buildYoutubeEmbedHtml(videoId: String): String = """
-    <html>
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-        <style>
-          html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            min-height: 100vh;
-            background: #000;
-            overflow: hidden;
-          }
-          #player {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-          }
-          iframe {
-            width: 100%;
-            height: 100%;
-            border: 0;
-            display: block;
-          }
-        </style>
-      </head>
-      <body>
-        <div id="player">
-          <iframe
-            width="100%"
-            height="100%"
-            src="https://www.youtube.com/embed/$videoId?playsinline=1&rel=0&modestbranding=1"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen>
-          </iframe>
-        </div>
-      </body>
-    </html>
-""".trimIndent()
