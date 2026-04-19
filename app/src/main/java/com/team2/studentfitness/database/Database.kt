@@ -8,7 +8,7 @@ import com.team2.studentfitness.R
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
-@androidx.room.Database(entities = [UserSettings::class, WorkEx::class, Exercises::class, HealthData::class, Workouts::class, MentalHealth::class], version = 4)
+@androidx.room.Database(entities = [UserSettings::class, WorkEx::class, Exercises::class, HealthData::class, Workouts::class, MentalHealth::class, MacroLog::class, WorkoutLog::class], version = 6)
 public abstract class Database : RoomDatabase() {
     abstract fun settingsDao(): SettingsDao
     abstract fun workoutsDao(): WorkoutsDao
@@ -16,6 +16,8 @@ public abstract class Database : RoomDatabase() {
     abstract fun workExDao(): WorkExDao
     abstract fun healthDao(): HealthDao
     abstract fun mentalHealthDao(): MentalHealthDao
+    abstract fun macroLogDao(): MacroLogDao
+    abstract fun workoutLogDao(): WorkoutLogDao
 
     companion object {
         @Volatile

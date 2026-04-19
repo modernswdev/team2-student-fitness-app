@@ -22,20 +22,15 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.team2.studentfitness.ui.navigation.AppRoutes
-import com.team2.studentfitness.ui.screens.DeveloperMenuScreen
-import com.team2.studentfitness.ui.screens.DetailScreen
-import com.team2.studentfitness.ui.screens.Dashboard
-import com.team2.studentfitness.ui.screens.LoginScreen
-import com.team2.studentfitness.ui.screens.OnboardingScreen
-import com.team2.studentfitness.ui.screens.SettingsScreen
-import com.team2.studentfitness.ui.screens.WorkoutScreen
-import com.team2.studentfitness.ui.screens.ExerciseListScreen
+import com.team2.studentfitness.ui.screens.*
 import com.team2.studentfitness.ui.theme.StudentFitnessTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.team2.studentfitness.viewmodels.LoginViewModel
 import com.team2.studentfitness.viewmodels.OnboardingViewModel
 import com.team2.studentfitness.viewmodels.SecurePinManager
+import com.team2.studentfitness.viewmodels.WorkoutViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -125,7 +120,14 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(AppRoutes.Workouts) {
-                            WorkoutScreen(navController = navController)
+                            val workoutViewModel: WorkoutViewModel = viewModel()
+                            WorkoutScreen(navController = navController, workoutViewModel = workoutViewModel)
+                        }
+                        composable(AppRoutes.Macros) {
+                            MacroScreen(navController = navController)
+                        }
+                        composable(AppRoutes.WeightProgress) {
+                            WeightProgressScreen(navController = navController)
                         }
                         composable(
                             route = AppRoutes.ExerciseListTemplate,
