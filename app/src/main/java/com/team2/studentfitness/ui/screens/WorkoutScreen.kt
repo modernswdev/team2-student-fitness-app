@@ -40,6 +40,13 @@ fun WorkoutScreen(navController: NavController, workoutViewModel: WorkoutViewMod
     val workouts by workoutViewModel.workouts.collectAsState()
     val isLoading by workoutViewModel.isLoading.collectAsState()
 
+    // Load workouts on start if list is empty
+    LaunchedEffect(Unit) {
+        if (workouts.isEmpty()) {
+            workoutViewModel.loadWorkoutsByDifficulty(0) // Default to beginner
+        }
+    }
+
     val textColor = if (isDark) Color.White else Color.Black
     val backgroundColor = if (isDark) Color.Black else Teal
     val cardBackground = if (isDark) Color(0xFF1E1E1E) else Color.White
@@ -102,7 +109,6 @@ fun WorkoutScreen(navController: NavController, workoutViewModel: WorkoutViewMod
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Muscle Group", color = Color.White, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
-                    // Removed "Glutes" as it was causing empty results in the current dataset
                     val muscleGroups = listOf("Biceps", "Legs", "Chest", "Core", "Back")
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         muscleGroups.forEach { group ->
@@ -125,7 +131,13 @@ fun WorkoutScreen(navController: NavController, workoutViewModel: WorkoutViewMod
         )
 
         if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally), color = Orange)
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = Orange)
+            }
+        } else if (workouts.isEmpty()) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("No workouts found. Try a different filter.", color = textColor.copy(alpha = 0.6f))
+            }
         } else {
             LazyColumn(
                 modifier = Modifier.weight(1f),

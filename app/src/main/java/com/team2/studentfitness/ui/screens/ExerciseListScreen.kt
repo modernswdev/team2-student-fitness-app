@@ -21,8 +21,11 @@ import androidx.navigation.NavController
 import com.team2.studentfitness.DatabaseCreation
 import com.team2.studentfitness.database.Exercises
 import com.team2.studentfitness.database.WorkEx
+import com.team2.studentfitness.database.WorkoutLog
 import com.team2.studentfitness.ui.theme.Teal
+import com.team2.studentfitness.ui.theme.Orange
 import com.team2.studentfitness.viewmodels.WorkoutViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,15 +36,16 @@ fun ExerciseListScreen(
     workoutViewModel: WorkoutViewModel = viewModel()
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val database = (context.applicationContext as DatabaseCreation).database
     val settingsDao = database.settingsDao()
+    val workoutLogDao = database.workoutLogDao()
     val userSettings by settingsDao.getLatestFlow().collectAsState(initial = null)
     val isDark = userSettings?.theme == 1
 
     val selectedWorkoutExercises by workoutViewModel.selectedWorkoutExercises.collectAsState()
 
     LaunchedEffect(workoutId) {
-        // We need a way to load by ID directly or find the workout object
         val workout = database.workoutsDao().getById(workoutId)
         if (workout != null) {
             workoutViewModel.loadExercisesForWorkout(workout)
@@ -91,6 +95,26 @@ fun ExerciseListScreen(
                 ) {
                     items(selectedWorkoutExercises) { (workEx, exercise) ->
                         ExerciseCard(workEx, exercise, cardBackground, textColor)
+                    }
+                    
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(
+                            onClick = {
+                                scope.launch {
+                                    workoutLogDao.insert(WorkoutLog(workoutId = workoutId))
+                                    navController.navigateUp()
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Orange),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text("Finish Workout", fontWeight = FontWeight.Bold, color = Color.White)
+                        }
+                        Spacer(modifier = Modifier.height(24.dp))
                     }
                 }
             }

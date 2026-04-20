@@ -24,5 +24,11 @@ data class UserSettings (
     @ColumnInfo(name = "sex", defaultValue = "MALE")
     val sex: String = "MALE",
     @ColumnInfo(name = "activityLevel", defaultValue = "SEDENTARY")
-    val activityLevel: String = "SEDENTARY"
+    val activityLevel: String = "SEDENTARY",
+    @ColumnInfo(name = "macroDisplayStyle", defaultValue = "Bar")
+    val macroDisplayStyle: String = "Bar",
+    @ColumnInfo(name = "visibleMacros", defaultValue = "Protein,Carbs,Fat,Calories")
+    val visibleMacros: String = "Protein,Carbs,Fat,Calories",
+    @ColumnInfo(name = "workoutsPerWeekGoal", defaultValue = "3")
+    val workoutsPerWeekGoal: Int = 3
 )

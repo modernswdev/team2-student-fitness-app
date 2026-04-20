@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import com.team2.studentfitness.ui.theme.Cream
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,10 +33,10 @@ fun DetailScreen(navController: NavController, feature: String?) {
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = _root_ide_package_.com.team2.studentfitness.ui.theme.Cream)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Cream)
             )
         },
-        containerColor = _root_ide_package_.com.team2.studentfitness.ui.theme.Cream
+        containerColor = Cream
     ) { paddingValues ->
         Box(
             modifier = Modifier
