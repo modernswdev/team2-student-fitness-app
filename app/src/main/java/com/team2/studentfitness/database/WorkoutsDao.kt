@@ -12,13 +12,13 @@ interface WorkoutsDao {
     suspend fun getAll(): List<Workouts>
 
     @Query("SELECT * FROM Workouts WHERE uid = :uid")
-    suspend fun getById(uid: Int): Workouts
+    suspend fun getById(uid: Int): Workouts?
 
     @Query("SELECT * FROM Workouts WHERE name = :name")
     suspend fun getByName(name: String): List<Workouts>
 
     @Insert()
-    suspend fun insert(workouts: Workouts)
+    suspend fun insert(workouts: Workouts): Long
 
     @Delete()
     suspend fun delete(workouts: Workouts)
