@@ -58,6 +58,7 @@ class MainActivity : ComponentActivity() {
                 val securePinManager = remember { SecurePinManager(context) }
                 val loginViewModel = remember { LoginViewModel(securePinManager) }
                 val onboardingViewModel = remember { OnboardingViewModel(application, securePinManager) }
+                val workoutViewModel: WorkoutViewModel = viewModel()
 
                 val startDestination = if (onboardingViewModel.isOnboardingCompleted()) {
                     if (securePinManager.isPinSet()) AppRoutes.Login else AppRoutes.Dashboard
@@ -120,8 +121,21 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(AppRoutes.Workouts) {
-                            val workoutViewModel: WorkoutViewModel = viewModel()
                             WorkoutScreen(navController = navController, workoutViewModel = workoutViewModel)
+                        }
+                        composable(AppRoutes.BuildWorkout) {
+                            BuildWorkoutScreen(navController = navController, workoutViewModel = workoutViewModel)
+                        }
+                        composable(
+                            route = AppRoutes.ExerciseSelection,
+                            arguments = listOf(navArgument("muscleGroup") { type = NavType.StringType })
+                        ) { backStackEntry ->
+                            val muscleGroup = backStackEntry.arguments?.getString("muscleGroup") ?: ""
+                            ExerciseSelectionScreen(
+                                navController = navController,
+                                muscleGroup = muscleGroup,
+                                workoutViewModel = workoutViewModel
+                            )
                         }
                         composable(AppRoutes.Macros) {
                             MacroScreen(navController = navController)
@@ -141,7 +155,8 @@ class MainActivity : ComponentActivity() {
                             ExerciseListScreen(
                                 navController = navController,
                                 workoutId = workoutId,
-                                workoutName = workoutName
+                                workoutName = workoutName,
+                                workoutViewModel = workoutViewModel
                             )
                         }
                         composable(

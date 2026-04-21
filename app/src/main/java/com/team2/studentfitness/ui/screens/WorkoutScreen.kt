@@ -155,7 +155,7 @@ fun WorkoutScreen(navController: NavController, workoutViewModel: WorkoutViewMod
 
         // Build Button
         Button(
-            onClick = { /* Handle Build */ },
+            onClick = { navController.navigate(AppRoutes.BuildWorkout) },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
