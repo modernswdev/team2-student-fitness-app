@@ -34,8 +34,12 @@ WORKDIR /app
 COPY gradlew gradlew.bat gradle.properties settings.gradle.kts build.gradle.kts ./
 COPY gradle/ gradle/
 
-# Make Gradle wrapper executable and pre-download Gradle distribution
-RUN chmod +x gradlew && ./gradlew --version
+# Normalize shell scripts from Windows checkouts and pre-download Gradle
+RUN sed -i 's/\r$//' gradlew && chmod +x gradlew && ./gradlew --version
+
+# Keep install script in the image (avoids host line-ending issues on bind mounts)
+COPY docker/install-apk.sh /usr/local/bin/install-apk.sh
+RUN sed -i 's/\r$//' /usr/local/bin/install-apk.sh && chmod +x /usr/local/bin/install-apk.sh
 
 # Copy the rest of the project
 COPY app/ app/

@@ -48,8 +48,7 @@ services:
       - emulator
     volumes:
       - ./app/build/outputs:/app/app/build/outputs
-      - ./docker/install-apk.sh:/install-apk.sh:ro
-    entrypoint: ["/bin/bash", "/install-apk.sh"]
+    entrypoint: ["/bin/bash", "/usr/local/bin/install-apk.sh"]
     environment:
       EMULATOR_HOST: "emulator"
       EMULATOR_ADB_PORT: "5555"

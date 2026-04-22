@@ -148,13 +148,14 @@ docker compose down
 ### `Dockerfile`
 1. Starts from an **Eclipse Temurin JDK 17** base image (required by AGP 9.x).
 2. Installs the **Android SDK command-line tools**, `platform-tools`, `platforms;android-36`, and `build-tools;36.0.0`.
-3. Copies the project and runs `./gradlew assembleDebug` to produce the APK.
+3. Normalizes line endings for shell scripts so Docker builds also work from Windows checkouts.
+4. Copies the project and runs `./gradlew assembleDebug` to produce the APK.
 
 ### `docker-compose.yml`
 - **`build`** — builds the debug APK; mounts `app/build/outputs/` to the host.
 - **`test`** — runs JVM unit tests; mounts `app/build/reports/` to the host.
 - **`emulator`** — runs [`budtmo/docker-android:emulator_14.0`](https://github.com/budtmo/docker-android), an Android 14 emulator with a web VNC interface on port 6080.
-- **`install`** — uses the build image's ADB to connect to the emulator and install the APK; delegates to `docker/install-apk.sh`.
+- **`install`** — uses the build image's ADB to connect to the emulator and install the APK; delegates to the image-bundled install script.
 
 ### `docker/install-apk.sh`
 Polls the emulator via ADB until `sys.boot_completed=1`, then runs `adb install`.
