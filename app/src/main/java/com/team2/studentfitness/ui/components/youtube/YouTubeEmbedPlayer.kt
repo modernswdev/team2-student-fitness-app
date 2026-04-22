@@ -6,6 +6,8 @@ import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.key
@@ -108,5 +110,20 @@ fun YouTubeEmbedPlayer(
             }
         )
     }
+}
+
+@Composable
+fun EmbeddedYouTubeVideo(
+    videoId: String,
+    onLoadFailed: () -> Unit = {},
+    modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .aspectRatio(16f / 9f)
+) {
+    YouTubeEmbedPlayer(
+        videoId = videoId,
+        modifier = modifier,
+        onLoadFailed = onLoadFailed
+    )
 }
 
