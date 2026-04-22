@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    command: ["./gradlew", "assembleDebug", "--no-daemon"]
     volumes:
       - ./app/build/outputs:/app/app/build/outputs
 

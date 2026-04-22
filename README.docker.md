@@ -152,7 +152,7 @@ docker compose down
 4. Copies the project and runs `./gradlew assembleDebug` to produce the APK.
 
 ### `docker-compose.yml`
-- **`build`** — builds the debug APK; mounts `app/build/outputs/` to the host.
+- **`build`** — runs `./gradlew assembleDebug --no-daemon` and writes the debug APK to mounted `app/build/outputs/` on the host.
 - **`test`** — runs JVM unit tests; mounts `app/build/reports/` to the host.
 - **`emulator`** — runs [`budtmo/docker-android:emulator_14.0`](https://github.com/budtmo/docker-android), an Android 14 emulator with a web VNC interface on port 6080.
 - **`install`** — uses the build image's ADB to connect to the emulator and install the APK; delegates to the image-bundled install script.
