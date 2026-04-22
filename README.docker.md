@@ -154,7 +154,7 @@ docker compose down
 ### `docker-compose.yml`
 - **`build`** — runs `./gradlew assembleDebug --no-daemon` and writes the debug APK to mounted `app/build/outputs/` on the host.
 - **`test`** — runs JVM unit tests; mounts `app/build/reports/` to the host.
-- **`emulator`** — runs [`budtmo/docker-android:emulator_14.0`](https://github.com/budtmo/docker-android), an Android 14 emulator with a web VNC interface on port 6080.
+- **`emulator`** — runs [`budtmo/docker-android:emulator_14.0`](https://github.com/budtmo/docker-android), an Android 14 emulator with a web VNC interface on port 6080. Resource limits are set to 4 CPUs / 4 GB RAM (with 2 CPUs / 2 GB reserved) so the emulator has enough headroom to boot reliably.
 - **`install`** — uses the build image's ADB to connect to the emulator and install the APK; delegates to the image-bundled install script.
 
 ### `docker/install-apk.sh`
@@ -167,6 +167,7 @@ Polls the emulator via ADB until `sys.boot_completed=1`, then runs `adb install`
 - First-time emulator pulls and image builds take several minutes. Subsequent starts are much faster.
 - Emulator data (installed apps, settings) is persisted in the `emulator-data` Docker volume across restarts.
 - To wipe the emulator data: `docker compose down -v`
+- The emulator service is configured with **4 CPU / 4 GB RAM** limits and **2 CPU / 2 GB RAM** reservations. If your machine has fewer resources, edit the `deploy.resources` section in `docker-compose.yml` to match what is available. Docker Desktop users should ensure the resource sliders in **Settings → Resources** give Docker at least 2 CPUs and 3 GB of RAM.
 - To force a clean rebuild of the build image:
   ```bash
   docker compose build --no-cache
