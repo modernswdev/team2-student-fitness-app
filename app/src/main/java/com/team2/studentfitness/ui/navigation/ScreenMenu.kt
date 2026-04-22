@@ -16,6 +16,8 @@ object AppRoutes {
     const val ExerciseSelection = "exercise-selection/{muscleGroup}"
     const val ExerciseListTemplate = "exercises/{workoutId}/{workoutName}"
     const val DetailTemplate = "detail/{feature}"
+    const val VideoDemo = "video-demo"
+    const val OfficialYouTubeDemo = "official-youtube-demo"
     const val Macros = "macros"
     const val WeightProgress = "weight-progress"
 
@@ -30,6 +32,8 @@ val ScreenMenu = listOf(
     ScreenMenuItem(title = "Onboarding", route = AppRoutes.Onboarding),
     ScreenMenuItem(title = "Dashboard", route = AppRoutes.Dashboard),
     ScreenMenuItem(title = "Settings", route = AppRoutes.Settings),
+    ScreenMenuItem(title = "Video Demo", route = AppRoutes.VideoDemo),
+    ScreenMenuItem(title = "Official YouTube Demo", route = AppRoutes.OfficialYouTubeDemo),
     ScreenMenuItem(title = "Workouts", route = AppRoutes.Workouts),
     ScreenMenuItem(title = "Build Workout", route = AppRoutes.BuildWorkout),
     ScreenMenuItem(title = "Macros", route = AppRoutes.Macros),

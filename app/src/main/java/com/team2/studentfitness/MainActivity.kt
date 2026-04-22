@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
             val context = LocalContext.current
             val database = (application as DatabaseCreation).database
             val settingsDao = database.settingsDao()
-            
+
             // Use Flow to observe theme changes in real-time across the app
             val latestSettings by settingsDao.getLatestFlow().collectAsState(initial = null)
             val isDarkMode = latestSettings?.theme == 1
@@ -120,6 +120,11 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
+                        composable(AppRoutes.VideoDemo) {
+                            VideoDemoScreen()
+                        }
+                        composable(AppRoutes.OfficialYouTubeDemo) {
+                            OfficialYouTubeDemoScreen()
                         composable(AppRoutes.Workouts) {
                             WorkoutScreen(navController = navController, workoutViewModel = workoutViewModel)
                         }
@@ -171,4 +176,5 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
 }
