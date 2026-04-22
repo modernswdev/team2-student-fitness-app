@@ -1,6 +1,9 @@
 package com.team2.studentfitness.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -31,12 +34,12 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.team2.studentfitness.DatabaseCreation
 import com.team2.studentfitness.R
-import com.team2.studentfitness.database.HealthData
-import com.team2.studentfitness.database.MentalHealth
-import com.team2.studentfitness.database.UserSettings
+import com.team2.studentfitness.database.*
 import com.team2.studentfitness.ui.navigation.AppRoutes
 import com.team2.studentfitness.ui.theme.*
 import com.team2.studentfitness.viewmodels.HealthCalculations
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -51,6 +54,8 @@ fun Dashboard(navController: NavController) {
     val settingsDao = database.settingsDao()
     val mentalHealthDao = database.mentalHealthDao()
     val healthDao = database.healthDao()
+    val macroLogDao = database.macroLogDao()
+    val workoutLogDao = database.workoutLogDao()
 
     var userName by remember { mutableStateOf("Student") }
     var selectedTab by remember { mutableStateOf("Workout") }
@@ -58,6 +63,8 @@ fun Dashboard(navController: NavController) {
     // Health State
     var latestHealthData by remember { mutableStateOf<HealthData?>(null) }
     var userSettings by remember { mutableStateOf<UserSettings?>(null) }
+    var todayMacroLogs by remember { mutableStateOf<List<MacroLog>>(emptyList()) }
+    var workoutLogs by remember { mutableStateOf<List<WorkoutLog>>(emptyList()) }
     
     // Mental Health State
     var selectedMood by remember { mutableStateOf("") }
@@ -73,15 +80,38 @@ fun Dashboard(navController: NavController) {
 
     LaunchedEffect(Unit) {
         try {
-            userSettings = settingsDao.getLatest()
-            userSettings?.let {
-                userName = it.name
+            settingsDao.getLatestFlow().collect { settings ->
+                userSettings = settings
+                userName = settings?.name ?: "Student"
             }
-            latestHealthData = healthDao.getLatest()
+        } catch (_: Exception) {}
+    }
+
+    LaunchedEffect(Unit) {
+        try {
+            // Collect health data updates
+            while(true) {
+                latestHealthData = healthDao.getLatest()
+                delay(2000) // Poll for updates if not using Flow for HealthData
+            }
+        } catch (_: Exception) {}
+    }
+
+    LaunchedEffect(Unit) {
+        try {
             mentalHealthLogs = mentalHealthDao.getAll()
-        } catch (_: Exception) {
-            // Suppress unused exception warning
-        }
+            macroLogDao.getAllFlow().collect { logs ->
+                todayMacroLogs = logs.filter { isToday(it.timestamp) }
+            }
+        } catch (_: Exception) {}
+    }
+
+    LaunchedEffect(Unit) {
+        try {
+            workoutLogDao.getAllFlow().collect { logs ->
+                workoutLogs = logs
+            }
+        } catch (_: Exception) {}
     }
 
     val isDark = userSettings?.theme == 1
@@ -164,7 +194,7 @@ fun Dashboard(navController: NavController) {
 
             // Content Area
             if (selectedTab == "Workout") {
-                WorkoutTabContent(navController, latestHealthData, userSettings)
+                WorkoutTabContent(navController, latestHealthData, userSettings, todayMacroLogs, workoutLogs)
             } else {
                 MentalHealthTabContent(
                     selectedMood = selectedMood,
@@ -283,7 +313,7 @@ fun GymStatusCard(userSettings: UserSettings?) {
 }
 
 @Composable
-fun WorkoutTabContent(navController: NavController, healthData: HealthData?, userSettings: UserSettings?) {
+fun WorkoutTabContent(navController: NavController, healthData: HealthData?, userSettings: UserSettings?, macroLogs: List<MacroLog>, workoutLogs: List<WorkoutLog>) {
     val healthCalc = remember { HealthCalculations() }
     val isDark = userSettings?.theme == 1
     val textColor = if (isDark) Color.White else Color.Black
@@ -306,15 +336,31 @@ fun WorkoutTabContent(navController: NavController, healthData: HealthData?, use
         2000 // Default
     }
 
+    val totalCals = macroLogs.sumOf { it.calories }
+
     val weightDisplay = if (healthData != null) {
         if (userSettings?.isMetric != false) {
-            String.format(Locale.US, "%.2fkg", healthData.weight)
+            String.format(Locale.US, "%.1fkg", healthData.weight)
         } else {
-            "${(healthData.weight * 2.20462f).toInt()}lb"
+            "%.1flb".format(healthData.weight * 2.20462f)
         }
     } else {
         "--"
     }
+
+    // Workout Progress Logic
+    val workoutsToday = workoutLogs.filter { isToday(it.timestamp) }.size
+    val startOfWeek = getStartOfWeek()
+    val workoutsThisWeek = workoutLogs.filter { it.timestamp >= startOfWeek }.size
+    val weeklyGoal = userSettings?.workoutsPerWeekGoal ?: 3
+
+    val statusText = when {
+        workoutsToday > 0 -> "Daily Goal Achieved! 🎉"
+        workoutsThisWeek >= weeklyGoal -> "Good for the week! 🌟"
+        else -> "Workout Pending"
+    }
+    
+    val progress = (workoutsThisWeek.toFloat() / weeklyGoal).coerceIn(0f, 1f)
 
     Column(
         modifier = Modifier
@@ -340,20 +386,20 @@ fun WorkoutTabContent(navController: NavController, healthData: HealthData?, use
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Today's Progress",
+                        text = "Weekly Progress",
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = if (isDark) Color.White else Color.Black
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Workout Pending", 
+                        text = statusText, 
                         style = MaterialTheme.typography.bodyLarge,
                         color = if (isDark) Color.LightGray else Color.Black
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
-                        onClick = { navController.navigate(AppRoutes.detail("Workouts")) },
+                        onClick = { navController.navigate(AppRoutes.Workouts) },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                         shape = RoundedCornerShape(8.dp),
                         contentPadding = PaddingValues(horizontal = 24.dp)
@@ -364,11 +410,17 @@ fun WorkoutTabContent(navController: NavController, healthData: HealthData?, use
                 
                 Box(contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(
-                        progress = { 0f }, 
+                        progress = { progress }, 
                         modifier = Modifier.size(80.dp),
                         color = Color.White,
                         strokeWidth = 8.dp,
                         trackColor = Color.White.copy(alpha = 0.3f)
+                    )
+                    Text(
+                        text = "${(progress * 100).toInt()}%",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
                     )
                 }
             }
@@ -388,16 +440,16 @@ fun WorkoutTabContent(navController: NavController, healthData: HealthData?, use
                 modifier = Modifier.weight(1f),
                 cardBg = cardBg,
                 textColor = textColor,
-                onClick = { navController.navigate(AppRoutes.detail("Weight")) }
+                onClick = { navController.navigate(AppRoutes.WeightProgress) }
             )
             StatCard(
                 title = "Calories",
-                value = "0 / $calorieGoal", 
+                value = "$totalCals / $calorieGoal", 
                 icon = Icons.Default.Restaurant,
                 modifier = Modifier.weight(1f),
                 cardBg = cardBg,
                 textColor = textColor,
-                onClick = { navController.navigate(AppRoutes.detail("Calories")) }
+                onClick = { navController.navigate(AppRoutes.Macros) }
             )
         }
 
@@ -438,6 +490,138 @@ fun StatCard(
             Column {
                 Text(text = title, style = MaterialTheme.typography.labelMedium, color = Color.Gray)
                 Text(text = value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = textColor)
+            }
+        }
+    }
+}
+
+@Composable
+fun BreathingSection(userSettings: UserSettings?) {
+    val isDark = userSettings?.theme == 1
+    val cardBg = if (isDark) Color(0xFF1E1E1E) else Color(0xFFFAF3F3)
+    val textColor = if (isDark) Color.White else Color.Black
+    val accentColor = if (isDark) Teal else Color(0xFFB099FF)
+
+    var isRunning by remember { mutableStateOf(false) }
+    var phase by remember { mutableStateOf("Ready") }
+    var timeLeft by remember { mutableIntStateOf(4) }
+
+    val animationProgress by animateFloatAsState(
+        targetValue = when (phase) {
+            "Inhale" -> 1f
+            "Hold " -> 1f // Space added to distinguish from second hold if needed
+            "Exhale" -> 0.3f
+            "Hold" -> 0.3f
+            else -> 0.3f
+        },
+        animationSpec = tween(durationMillis = 4000, easing = LinearEasing),
+        label = "BreathingAnimation"
+    )
+
+    LaunchedEffect(isRunning) {
+        if (isRunning) {
+            while (isRunning) {
+                phase = "Inhale"
+                for (i in 4 downTo 1) {
+                    timeLeft = i
+                    delay(1000)
+                }
+                phase = "Hold "
+                for (i in 4 downTo 1) {
+                    timeLeft = i
+                    delay(1000)
+                }
+                phase = "Exhale"
+                for (i in 4 downTo 1) {
+                    timeLeft = i
+                    delay(1000)
+                }
+                phase = "Hold"
+                for (i in 4 downTo 1) {
+                    timeLeft = i
+                    delay(1000)
+                }
+            }
+        } else {
+            phase = "Ready"
+            timeLeft = 4
+        }
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = cardBg)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Guided Breathing",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = textColor
+            )
+            Text(
+                text = "Box breathing helps reduce stress",
+                style = MaterialTheme.typography.bodyMedium,
+                color = textColor.copy(alpha = 0.7f)
+            )
+            
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.size(160.dp)
+            ) {
+                // Animated Circle
+                Box(
+                    modifier = Modifier
+                        .size(140.dp * animationProgress)
+                        .clip(CircleShape)
+                        .background(accentColor.copy(alpha = 0.2f))
+                )
+                
+                // Static outer border
+                Box(
+                    modifier = Modifier
+                        .size(140.dp)
+                        .clip(CircleShape)
+                        .background(accentColor.copy(alpha = 0.1f))
+                )
+
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = phase.trim(),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = textColor
+                    )
+                    if (isRunning) {
+                        Text(
+                            text = timeLeft.toString(),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = textColor.copy(alpha = 0.8f)
+                        )
+                    }
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            Button(
+                onClick = { isRunning = !isRunning },
+                colors = ButtonDefaults.buttonColors(containerColor = accentColor),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = if (isRunning) "Stop" else "Start Exercise", 
+                    color = Color.White, 
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
             }
         }
     }
@@ -498,6 +682,10 @@ fun MentalHealthTabContent(
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        BreathingSection(userSettings)
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -608,6 +796,28 @@ fun JournalEntryItem(log: MentalHealth, cardBg: Color, textColor: Color) {
             )
         }
     }
+}
+
+private fun isToday(timestamp: Long): Boolean {
+    val cal = Calendar.getInstance()
+    val today = cal.get(Calendar.DAY_OF_YEAR)
+    val year = cal.get(Calendar.YEAR)
+    
+    val logCal = Calendar.getInstance()
+    logCal.timeInMillis = timestamp
+    return today == logCal.get(Calendar.DAY_OF_YEAR) && year == logCal.get(Calendar.YEAR)
+}
+
+private fun getStartOfWeek(): Long {
+    val cal = Calendar.getInstance()
+    cal.set(Calendar.HOUR_OF_DAY, 0)
+    cal.set(Calendar.MINUTE, 0)
+    cal.set(Calendar.SECOND, 0)
+    cal.set(Calendar.MILLISECOND, 0)
+    // Sunday is 1, Monday is 2 ... Saturday is 7
+    val dayOfWeek = cal.get(Calendar.DAY_OF_WEEK)
+    cal.add(Calendar.DAY_OF_YEAR, -(dayOfWeek - 1))
+    return cal.timeInMillis
 }
 
 @Preview(showBackground = true)

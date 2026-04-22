@@ -22,20 +22,15 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.team2.studentfitness.ui.navigation.AppRoutes
-import com.team2.studentfitness.ui.screens.DeveloperMenuScreen
-import com.team2.studentfitness.ui.screens.DetailScreen
-import com.team2.studentfitness.ui.screens.Dashboard
-import com.team2.studentfitness.ui.screens.LoginScreen
-import com.team2.studentfitness.ui.screens.OnboardingScreen
-import com.team2.studentfitness.ui.screens.OfficialYouTubeDemoScreen
-import com.team2.studentfitness.ui.screens.SettingsScreen
-import com.team2.studentfitness.ui.screens.VideoDemoScreen
+import com.team2.studentfitness.ui.screens.*
 import com.team2.studentfitness.ui.theme.StudentFitnessTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.team2.studentfitness.viewmodels.LoginViewModel
 import com.team2.studentfitness.viewmodels.OnboardingViewModel
 import com.team2.studentfitness.viewmodels.SecurePinManager
+import com.team2.studentfitness.viewmodels.WorkoutViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,6 +58,7 @@ class MainActivity : ComponentActivity() {
                 val securePinManager = remember { SecurePinManager(context) }
                 val loginViewModel = remember { LoginViewModel(securePinManager) }
                 val onboardingViewModel = remember { OnboardingViewModel(application, securePinManager) }
+                val workoutViewModel: WorkoutViewModel = viewModel()
 
                 val startDestination = if (onboardingViewModel.isOnboardingCompleted()) {
                     if (securePinManager.isPinSet()) AppRoutes.Login else AppRoutes.Dashboard
@@ -129,6 +125,44 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(AppRoutes.OfficialYouTubeDemo) {
                             OfficialYouTubeDemoScreen()
+                        composable(AppRoutes.Workouts) {
+                            WorkoutScreen(navController = navController, workoutViewModel = workoutViewModel)
+                        }
+                        composable(AppRoutes.BuildWorkout) {
+                            BuildWorkoutScreen(navController = navController, workoutViewModel = workoutViewModel)
+                        }
+                        composable(
+                            route = AppRoutes.ExerciseSelection,
+                            arguments = listOf(navArgument("muscleGroup") { type = NavType.StringType })
+                        ) { backStackEntry ->
+                            val muscleGroup = backStackEntry.arguments?.getString("muscleGroup") ?: ""
+                            ExerciseSelectionScreen(
+                                navController = navController,
+                                muscleGroup = muscleGroup,
+                                workoutViewModel = workoutViewModel
+                            )
+                        }
+                        composable(AppRoutes.Macros) {
+                            MacroScreen(navController = navController)
+                        }
+                        composable(AppRoutes.WeightProgress) {
+                            WeightProgressScreen(navController = navController)
+                        }
+                        composable(
+                            route = AppRoutes.ExerciseListTemplate,
+                            arguments = listOf(
+                                navArgument("workoutId") { type = NavType.IntType },
+                                navArgument("workoutName") { type = NavType.StringType }
+                            )
+                        ) { backStackEntry ->
+                            val workoutId = backStackEntry.arguments?.getInt("workoutId") ?: 0
+                            val workoutName = backStackEntry.arguments?.getString("workoutName") ?: "Exercises"
+                            ExerciseListScreen(
+                                navController = navController,
+                                workoutId = workoutId,
+                                workoutName = workoutName,
+                                workoutViewModel = workoutViewModel
+                            )
                         }
                         composable(
                             route = AppRoutes.DetailTemplate,

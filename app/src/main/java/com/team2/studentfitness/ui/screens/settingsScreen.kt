@@ -64,6 +64,7 @@ fun SettingsScreen(
             remindersEnabled = it.notifsOn
             darkModeEnabled = it.theme == 1
             homeGym = if (it.homeGym in gyms.indices) gyms[it.homeGym] else gyms.first()
+            weeklyGoal = it.workoutsPerWeekGoal.toFloat()
         }
     }
 
@@ -218,9 +219,16 @@ fun SettingsScreen(
 
                 Slider(
                     value = weeklyGoal,
-                    onValueChange = { weeklyGoal = it },
-                    valueRange = 0f..7f,
-                    steps = 6, 
+                    onValueChange = { 
+                        weeklyGoal = it 
+                        userSettings?.let { settings ->
+                            scope.launch {
+                                settingsDao.update(settings.copy(workoutsPerWeekGoal = it.toInt()))
+                            }
+                        }
+                    },
+                    valueRange = 1f..7f,
+                    steps = 5,
                     colors = SliderDefaults.colors(
                         thumbColor = if (darkModeEnabled) Teal else Orange,
                         activeTrackColor = if (darkModeEnabled) Teal else Orange,

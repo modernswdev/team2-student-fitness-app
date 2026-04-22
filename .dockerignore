@@ -1,0 +1,36 @@
+# Git
+.git
+.gitignore
+.github
+
+# IDE files
+.idea
+*.iml
+
+# Build outputs
+build/
+app/build/
+out/
+bin/
+gen/
+
+# Gradle caches (will be re-downloaded)
+.gradle/
+
+# Local Android SDK path (not needed in Docker)
+local.properties
+
+# Logs and profiling
+*.log
+*.hprof
+
+# macOS
+.DS_Store
+
+# Project documentation/non-build files
+README.md
+README.docker.md
+ROLES.md
+meetingNotes/
+workoutData/
+"Project- fittness app"/
