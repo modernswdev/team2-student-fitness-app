@@ -7,6 +7,8 @@ This setup mirrors the existing Docker Compose workflow with Kubernetes resource
 - Android emulator (`emulator` Deployment + Service)
 - APK install to emulator (`install-apk` Job)
 
+> `build-apk`, `run-unit-tests`, and `install-apk` share a `ReadWriteOnce` PVC and should be run sequentially (not at the same time).
+
 ## Prerequisites
 
 - A Kubernetes cluster with support for privileged pods
@@ -72,6 +74,7 @@ Open `http://<node-ip>:<node-port>` for the `6080/TCP` service port.
 ## Notes
 
 - `build-artifacts-pvc` stores Gradle build outputs and reports shared across Jobs.
+- `build-artifacts-pvc` uses `ReadWriteOnce` for broad storage-class compatibility, so run the Jobs one at a time.
 - `emulator-data-pvc` persists emulator data (`/home/androidusr`) across pod restarts.
 - If you need to re-run Jobs, delete the previous Job resource first:
 
