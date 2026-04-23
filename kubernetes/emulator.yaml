@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emulator
+  namespace: student-fitness
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: emulator
+  template:
+    metadata:
+      labels:
+        app: emulator
+    spec:
+      containers:
+        - name: emulator
+          image: budtmo/docker-android:emulator_14.0
+          env:
+            - name: EMULATOR_DEVICE
+              value: "Nexus 5"
+            - name: WEB_VNC
+              value: "true"
+          ports:
+            - containerPort: 6080
+              name: webvnc
+            - containerPort: 5554
+              name: adb-console
+            - containerPort: 5555
+              name: adb
+          resources:
+            limits:
+              cpu: "4"
+              memory: "4Gi"
+            requests:
+              cpu: "2"
+              memory: "2Gi"
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: emulator-data
+              mountPath: /home/androidusr
+            - name: kvm
+              mountPath: /dev/kvm
+      volumes:
+        - name: emulator-data
+          persistentVolumeClaim:
+            claimName: emulator-data-pvc
+        - name: kvm
+          hostPath:
+            path: /dev/kvm
+            type: CharDevice
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emulator
+  namespace: student-fitness
+spec:
+  type: NodePort
+  selector:
+    app: emulator
+  ports:
+    - name: webvnc
+      port: 6080
+      targetPort: 6080
+      protocol: TCP
+    - name: adb-console
+      port: 5554
+      targetPort: 5554
+      protocol: TCP
+    - name: adb
+      port: 5555
+      targetPort: 5555
+      protocol: TCP
