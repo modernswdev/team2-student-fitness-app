@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: build-apk
+  namespace: student-fitness
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 3600
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: build
+          image: student-fitness-android:local
+          imagePullPolicy: IfNotPresent
+          command: ["./gradlew", "assembleDebug", "--no-daemon"]
+          volumeMounts:
+            - name: build-artifacts
+              mountPath: /app/app/build
+      volumes:
+        - name: build-artifacts
+          persistentVolumeClaim:
+            claimName: build-artifacts-pvc
