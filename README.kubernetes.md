@@ -77,9 +77,12 @@ kubectl logs -n student-fitness job/run-unit-tests -f
 After the emulator is running and the build job has completed:
 
 ```bash
+kubectl delete job install-apk -n student-fitness --ignore-not-found
 kubectl apply -f kubernetes/install-job.yaml
 kubectl logs -n student-fitness job/install-apk -f
 ```
+
+> **Important:** Always delete the old `install-apk` Job before re-applying. Kubernetes Jobs are immutable once created — if the Job already exists, `kubectl apply` will report `unchanged` and no new pod will run. The `--ignore-not-found` flag makes the delete safe to run even when no prior Job exists, and works on Windows, macOS, and Linux.
 
 ## Accessing the emulator UI
 
@@ -143,5 +146,21 @@ kubectl apply -f kubernetes/
 - If you need to re-run Jobs, delete the previous Job resource first:
 
 ```bash
-kubectl delete job build-apk run-unit-tests install-apk -n student-fitness
+kubectl delete job build-apk run-unit-tests install-apk -n student-fitness --ignore-not-found
 ```
+
+### `kubectl apply` says `unchanged` and the app is not installed
+
+This means the `install-apk` Job already existed from a previous run. Kubernetes Jobs are immutable — `kubectl apply` will not create a new pod if the Job spec has not changed.
+
+**What happened:** The old job's logs are shown by `kubectl logs`, making it appear the install succeeded. But if the emulator pod was restarted since that old run, the app is no longer installed.
+
+**Fix:** Delete the old job first, then re-apply:
+
+```bat
+kubectl delete job install-apk -n student-fitness --ignore-not-found
+kubectl apply -f kubernetes/install-job.yaml
+kubectl logs -n student-fitness job/install-apk -f
+```
+
+> **Windows note:** Do not use `2>/dev/null || true` — that is bash syntax and does not work in Command Prompt or PowerShell. Use `--ignore-not-found` instead, which is a native `kubectl` flag and works on all platforms.
