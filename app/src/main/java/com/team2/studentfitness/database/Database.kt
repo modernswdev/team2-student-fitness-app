@@ -8,7 +8,7 @@ import com.team2.studentfitness.R
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
-@androidx.room.Database(entities = [UserSettings::class, WorkEx::class, Exercises::class, HealthData::class, Workouts::class, MentalHealth::class, MacroLog::class, WorkoutLog::class], version = 6)
+@androidx.room.Database(entities = [UserSettings::class, WorkEx::class, Exercises::class, HealthData::class, Workouts::class, MentalHealth::class, MacroLog::class, WorkoutLog::class], version = 7)
 public abstract class Database : RoomDatabase() {
     abstract fun settingsDao(): SettingsDao
     abstract fun workoutsDao(): WorkoutsDao
@@ -63,6 +63,7 @@ public abstract class Database : RoomDatabase() {
                             val muscleGroup = clean(parts[2])
                             val difficultyStr = clean(parts[3])
                             val description = clean(parts[4])
+                            val videoID = if (parts.size >= 6) clean(parts[5]) else null
 
                             val difficulty = when (difficultyStr.lowercase()) {
                                 "beginner" -> 0
@@ -72,8 +73,8 @@ public abstract class Database : RoomDatabase() {
                             }
 
                             db.execSQL(
-                                "INSERT INTO Exercises (name, muscleGroup, difficulty, description) VALUES (?, ?, ?, ?)",
-                                arrayOf<Any>(name, muscleGroup, difficulty, description)
+                                "INSERT INTO Exercises (name, muscleGroup, difficulty, description, videoID) VALUES (?, ?, ?, ?, ?)",
+                                arrayOf<Any?>(name, muscleGroup, difficulty, description, videoID)
                             )
                         }
                         line = r.readLine()

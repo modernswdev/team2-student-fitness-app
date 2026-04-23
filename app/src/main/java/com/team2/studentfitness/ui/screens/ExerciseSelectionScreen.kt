@@ -23,6 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.team2.studentfitness.DatabaseCreation
 import com.team2.studentfitness.database.Exercises
+import com.team2.studentfitness.ui.components.youtube.EmbeddedYouTubeVideo
 import com.team2.studentfitness.ui.theme.Teal
 import com.team2.studentfitness.viewmodels.WorkoutViewModel
 
@@ -123,32 +124,47 @@ fun SelectionExerciseCard(
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
         border = if (isSelected) androidx.compose.foundation.BorderStroke(2.dp, Color(0xFFF7A643)) else null
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = exercise.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = textColor
-                )
-                Text(
-                    text = exercise.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = textColor.copy(alpha = 0.7f),
-                    maxLines = 2
-                )
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = exercise.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = textColor
+                    )
+                }
+                
+                IconButton(onClick = onSelect) {
+                    Icon(
+                        imageVector = if (isSelected) Icons.Default.Check else Icons.Default.Add,
+                        contentDescription = if (isSelected) "Selected" else "Add",
+                        tint = if (isSelected) Color(0xFFF7A643) else textColor.copy(alpha = 0.5f)
+                    )
+                }
             }
-            
-            IconButton(onClick = onSelect) {
-                Icon(
-                    imageVector = if (isSelected) Icons.Default.Check else Icons.Default.Add,
-                    contentDescription = if (isSelected) "Selected" else "Add",
-                    tint = if (isSelected) Color(0xFFF7A643) else textColor.copy(alpha = 0.5f)
-                )
+
+            Text(
+                text = exercise.description,
+                style = MaterialTheme.typography.bodySmall,
+                color = textColor.copy(alpha = 0.7f),
+                maxLines = 3
+            )
+
+            exercise.videoID?.let { videoId ->
+                if (videoId.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    EmbeddedYouTubeVideo(
+                        videoId = videoId,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(16f / 9f)
+                    )
+                }
             }
         }
     }
