@@ -132,7 +132,14 @@ kubectl apply -f kubernetes/
 
 - `build-artifacts-pvc` stores Gradle build outputs and reports shared across Jobs.
 - `build-artifacts-pvc` uses `ReadWriteOnce` for broad storage-class compatibility, so run the Jobs one at a time.
-- `emulator-data-pvc` persists emulator data (`/home/androidusr`) across pod restarts.
+- `emulator-data-pvc` persists emulator AVD data (`/home/androidusr/.android`) across pod restarts.
+  > **Note:** Unlike Docker named volumes, Kubernetes PVCs start empty and do **not** inherit the container's existing directory contents on first use. For this reason the PVC is mounted at `/home/androidusr/.android` (the AVD state directory) rather than the top-level `/home/androidusr`, which would shadow the startup scripts shipped inside the image and cause a `CrashLoopBackOff`. If you previously applied `emulator.yaml` with the old mount path, delete and recreate the `emulator-data-pvc` PVC and the emulator Deployment before re-applying:
+  > ```bash
+  > kubectl delete deployment emulator -n student-fitness
+  > kubectl delete pvc emulator-data-pvc -n student-fitness
+  > kubectl apply -f kubernetes/persistent-volume-claims.yaml
+  > kubectl apply -f kubernetes/emulator.yaml
+  > ```
 - If you need to re-run Jobs, delete the previous Job resource first:
 
 ```bash

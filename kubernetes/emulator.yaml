@@ -39,7 +39,7 @@ spec:
             privileged: true
           volumeMounts:
             - name: emulator-data
-              mountPath: /home/androidusr
+              mountPath: /home/androidusr/.android
             - name: kvm
               mountPath: /dev/kvm
       volumes:
