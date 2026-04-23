@@ -4,6 +4,8 @@ metadata:
   name: emulator-data-pvc
   namespace: student-fitness
 spec:
+  # Single emulator pod writes this volume.
+  # ReadWriteOnce keeps compatibility with common default storage classes.
   accessModes:
     - ReadWriteOnce
   resources:
