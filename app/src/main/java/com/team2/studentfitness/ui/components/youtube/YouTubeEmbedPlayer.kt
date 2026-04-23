@@ -126,4 +126,3 @@ fun EmbeddedYouTubeVideo(
         onLoadFailed = onLoadFailed
     )
 }
-
