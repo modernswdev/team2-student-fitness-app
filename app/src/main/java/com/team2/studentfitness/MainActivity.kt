@@ -120,6 +120,15 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
+<<<<<<< Updated upstream
+=======
+                        composable(AppRoutes.VideoDemo) {
+                            VideoDemoScreen()
+                        }
+                        composable(AppRoutes.OfficialYouTubeDemo) {
+                            OfficialYouTubeDemoScreen()
+                        }
+>>>>>>> Stashed changes
                         composable(AppRoutes.Workouts) {
                             WorkoutScreen(navController = navController, workoutViewModel = workoutViewModel)
                         }
