@@ -24,11 +24,31 @@ From the repository root:
 docker build -t student-fitness-android:local .
 ```
 
-If using a local cluster, load that image into the cluster runtime (example for minikube):
+If using a local cluster, load that image into the cluster runtime.
 
+**minikube:**
 ```bash
 minikube image load student-fitness-android:local
 ```
+
+**kind** (Kubernetes in Docker):
+
+First, make sure the `kind` CLI is installed. If it is not:
+- **Windows:** Download the binary from https://kind.sigs.k8s.io/dl/latest/kind-windows-amd64 and place it in a directory on your `PATH` (e.g. `C:\Windows\System32\kind.exe`), or install via Chocolatey: `choco install kind`
+- **macOS:** `brew install kind`
+- **Linux:** `go install sigs.k8s.io/kind@latest` or download from the releases page
+
+Then load the image into all kind nodes. If your cluster is the default unnamed cluster:
+```bash
+kind load docker-image student-fitness-android:local
+```
+
+If your cluster has a name (check with `kind get clusters`):
+```bash
+kind load docker-image student-fitness-android:local --name <cluster-name>
+```
+
+> **Note:** `kind load docker-image` must be re-run every time you rebuild the image, because kind nodes have their own isolated container runtime separate from your local Docker daemon.
 
 ## 2) Apply Kubernetes resources
 
