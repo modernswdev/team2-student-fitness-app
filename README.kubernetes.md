@@ -91,6 +91,43 @@ kubectl get svc emulator -n student-fitness
 
 Open `http://<node-ip>:<node-port>` for the `6080/TCP` service port.
 
+## Troubleshooting
+
+### `ERROR: no nodes found for cluster "kind"` (or any cluster name)
+
+This error means no kind cluster is currently running. kind clusters are **ephemeral** — they do not persist across machine reboots or Docker Desktop restarts. You must create the cluster before loading images or deploying resources.
+
+**1. Create a kind cluster**
+
+```bat
+kind create cluster --name kind
+```
+
+Wait ~1–2 minutes for the cluster to be ready.
+
+**2. Verify it is running**
+
+```bat
+kind get clusters
+kubectl cluster-info --context kind-kind
+```
+
+**3. Load your image into the cluster**
+
+```bat
+kind load docker-image student-fitness-android:local --name kind
+```
+
+**4. Continue with deployment**
+
+```bat
+kubectl apply -f kubernetes/
+```
+
+> **Why this happens:** Unlike Docker containers, a kind cluster lives inside Docker containers that are destroyed when Docker Desktop stops or your machine restarts. You need to re-run `kind create cluster` and `kind load docker-image` each time this happens.
+
+---
+
 ## Notes
 
 - `build-artifacts-pvc` stores Gradle build outputs and reports shared across Jobs.
