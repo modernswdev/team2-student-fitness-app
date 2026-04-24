@@ -22,6 +22,7 @@ import com.team2.studentfitness.DatabaseCreation
 import com.team2.studentfitness.database.Exercises
 import com.team2.studentfitness.database.WorkEx
 import com.team2.studentfitness.database.WorkoutLog
+import com.team2.studentfitness.ui.components.youtube.EmbeddedYouTubeVideo
 import com.team2.studentfitness.ui.theme.Teal
 import com.team2.studentfitness.ui.theme.Orange
 import com.team2.studentfitness.viewmodels.WorkoutViewModel
@@ -181,6 +182,18 @@ fun ExerciseCard(workEx: WorkEx, exercise: Exercises, backgroundColor: Color, te
                 color = textColor.copy(alpha = 0.8f),
                 lineHeight = 18.sp
             )
+
+            exercise.videoID?.let { videoId ->
+                if (videoId.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    EmbeddedYouTubeVideo(
+                        videoId = videoId,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(16f / 9f)
+                    )
+                }
+            }
         }
     }
 }

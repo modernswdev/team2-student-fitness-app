@@ -125,6 +125,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(AppRoutes.OfficialYouTubeDemo) {
                             OfficialYouTubeDemoScreen()
+                        }
                         composable(AppRoutes.Workouts) {
                             WorkoutScreen(navController = navController, workoutViewModel = workoutViewModel)
                         }
@@ -176,5 +177,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
 }

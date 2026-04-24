@@ -16,6 +16,7 @@ data class Exercises (
     @ColumnInfo(name = "difficulty")
     val difficulty: Int,   //0 = beginner, 1 = intermediate, 2 = advanced
     @ColumnInfo(name = "description")
-    val description: String
+    val description: String,
+    @ColumnInfo(name = "videoID")
+    val videoID: String? = null
 )
-
