@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: install-apk
+  namespace: student-fitness
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 3600
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: install
+          image: student-fitness-android:local
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/bash", "/usr/local/bin/install-apk.sh"]
+          env:
+            - name: EMULATOR_HOST
+              value: emulator
+            - name: EMULATOR_ADB_PORT
+              value: "5555"
+          volumeMounts:
+            - name: build-artifacts
+              mountPath: /app/app/build
+      volumes:
+        - name: build-artifacts
+          persistentVolumeClaim:
+            claimName: build-artifacts-pvc

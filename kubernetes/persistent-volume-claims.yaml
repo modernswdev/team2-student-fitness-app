@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: emulator-data-pvc
+  namespace: student-fitness
+spec:
+  # Single emulator pod writes this volume.
+  # ReadWriteOnce keeps compatibility with common default storage classes.
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: build-artifacts-pvc
+  namespace: student-fitness
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
