@@ -6,10 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Build
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -18,7 +14,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.team2.studentfitness.ui.navigation.AppRoutes
@@ -53,7 +48,6 @@ class MainActivity : ComponentActivity() {
 
             StudentFitnessTheme(darkTheme = isDarkMode) {
                 val navController = rememberNavController()
-                val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route
 
                 val securePinManager = remember { SecurePinManager(context) }
                 val loginViewModel = remember { LoginViewModel(securePinManager) }
@@ -67,15 +61,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    floatingActionButton = {
-                        // Keep dev menu available everywhere for developers
-                        if (currentDestination != AppRoutes.DeveloperMenu) {
-                            FloatingActionButton(onClick = { navController.navigate(AppRoutes.DeveloperMenu) }) {
-                                Icon(imageVector = Icons.Default.Build, contentDescription = "Open developer menu")
-                            }
-                        }
-                    }
+                    modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
                     NavHost(
                         navController = navController,
@@ -100,8 +86,7 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate(AppRoutes.Dashboard) {
                                         popUpTo(AppRoutes.Login) { inclusive = true }
                                     }
-                                },
-                                onOpenDevMenu = { navController.navigate(AppRoutes.DeveloperMenu) }
+                                }
                             )
                         }
                         composable(AppRoutes.DeveloperMenu) {

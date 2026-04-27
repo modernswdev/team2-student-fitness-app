@@ -19,8 +19,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.team2.studentfitness.ui.theme.LoginBackground
-import com.team2.studentfitness.ui.theme.LoginOrange
 import com.team2.studentfitness.ui.theme.LoginInputBg
 import com.team2.studentfitness.viewmodels.LoginViewModel
 
@@ -28,8 +26,7 @@ import com.team2.studentfitness.viewmodels.LoginViewModel
 fun LoginScreen(
     viewModel: LoginViewModel,
     modifier: Modifier = Modifier,
-    onLoginSuccess: () -> Unit = {},
-    onOpenDevMenu: () -> Unit = {}
+    onLoginSuccess: () -> Unit = {}
 ) {
     var pin by remember { mutableStateOf("") }
     val isPinSet = viewModel.isPinSet()
@@ -38,7 +35,6 @@ fun LoginScreen(
     val isDark = isSystemInDarkTheme()
     val bgColor = MaterialTheme.colorScheme.background
     val accentColor = MaterialTheme.colorScheme.secondary
-    val secondaryTextColor = if (isDark) Color.LightGray else Color.White // Original subtitle was white on teal
 
     Box(
         modifier = modifier
@@ -151,14 +147,6 @@ fun LoginScreen(
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
                     )
-                }
-
-                // Bypass Button (Dev Only)
-                TextButton(
-                    onClick = onOpenDevMenu,
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp)
-                ) {
-                    Text("Open Dev Menu", color = accentColor.copy(alpha = 0.8f), fontSize = 12.sp)
                 }
             }
 
